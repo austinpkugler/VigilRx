@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 
 
 class PrescriptionForm(forms.Form):
-    npi = forms.CharField(label='National Provider Identifier', max_length=10)
-    ndc = forms.CharField(label='National Drug Code', max_length=11)
-    quantity = forms.CharField(label='Quantity', max_length=5)
-    refills = forms.CharField(label='Refills', max_length=5)
+    patient = forms.CharField(label='Patient Address', max_length=20)
+    ndc = forms.CharField(label='National Drug Code', max_length=20)
+    quantity = forms.CharField(label='Quantity', max_length=20)
+    refills = forms.CharField(label='Refills', max_length=20)
