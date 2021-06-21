@@ -13,7 +13,7 @@ contract Prescriber{
     mapping(bytes32 => address) _patientContracts;
     mapping(address => address []) _patientPrescriptions;
 
-    Prescription private newRx;
+    Prescription private tempRx;
 
     modifier onlyOwner {
     require(msg.sender == owner);
@@ -45,10 +45,13 @@ contract Prescriber{
         _patientContracts[oldKey] = address(0x0);
     }
 
+    // Initiate a new prescription
     function newPrescription(bytes32 patientKey, uint32 _ndc, uint _quantity, uint _refills) external onlyOwner{
         
+        // Make sure the patient mapping is populated
         require(_patientContracts[patientKey] != address(0x0));
         
+        // Create a new contract and get its address
         address newContract = address(new Prescription(
             address(this), 
             _patientContracts[patientKey],
@@ -56,6 +59,7 @@ contract Prescriber{
             _quantity,
             _refills));
 
+        // Push the new contract's address to the patient history
         _patientPrescriptions[_patientContracts[patientKey]].push(newContract);
     }
 
@@ -66,7 +70,8 @@ contract Prescriber{
 
     // View the status of a given prescription contract
     function viewRx(address rxAddress) external onlyOwner{
-        
+        tempRx = Prescription(rxAddress);
+        tempRx.viewScript();
     }
 
     // View the history of a given patient contract if permissioned
