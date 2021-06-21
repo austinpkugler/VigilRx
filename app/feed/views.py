@@ -35,3 +35,14 @@ def home(request):
 
 def about(request):
     return render(request, 'feed/about.html', {'title': 'About'})
+
+
+def prescribe(request):
+    if request.method == 'POST':
+        form = PrescriptionForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+        return HttpResponseRedirect('')
+    else:
+        form = PrescriptionForm()
+    return render(request, 'feed/prescribe.html', {'title': 'New Prescription', 'form': form})
