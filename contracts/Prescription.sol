@@ -2,7 +2,7 @@ pragma solidity ^0.8.4;
 
 contract Prescription {
     struct PrescriptionInfo {
-        address prescriberAddress;
+        address prescriberAddress;  
         uint32 ndc;
         uint quantity;
         uint refills;
