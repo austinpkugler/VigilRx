@@ -41,7 +41,8 @@ def prescribe(request):
     if request.method == 'POST':
         form = PrescriptionForm(request.POST)
         if form.is_valid():
-            print(form.cleaned_data)
+            print(f'{form.cleaned_data}')
+            # Create prescription contract from prescriber
         return HttpResponseRedirect('')
     else:
         form = PrescriptionForm()
