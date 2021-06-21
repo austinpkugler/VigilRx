@@ -13,13 +13,13 @@ contract Prescription {
     address owner;
     mapping(address => bool) _permissionedParties;
 
-    constructor(address _prescriberAddress, uint32 _ndc, uint _quantity, uint _refills) {
+    constructor(address _prescriberAddress, address _patientAddress, uint32 _ndc, uint _quantity, uint _refills) {
         p.prescriberAddress = _prescriberAddress;
         p.ndc = _ndc;
         p.quantity = _quantity;
         p.refills = _refills;
 
-        owner = msg.sender;
+        owner = _patientAddress;
     }
 
     modifier onlyPermissioned {

@@ -1,5 +1,8 @@
 pragma solidity ^0.8.4;
 
+// import prescription contract for creation
+import "./Prescription.sol";
+
 contract Prescriber{
 
     // State variables
@@ -8,15 +11,18 @@ contract Prescriber{
 
     // Maps prescriber-defined keys to patient contract addresses
     mapping(bytes32 => address) _patientContracts;
+    mapping(address => address []) _patientPrescriptions;
 
-    constructor(address contractOwner, uint32 newNpi){
-        owner = contractOwner;
-        npi = newNpi;
-    }
+    Prescription private newRx;
 
     modifier onlyOwner {
     require(msg.sender == owner);
     _;
+    }
+
+    constructor(address contractOwner, uint32 newNpi){
+        owner = contractOwner;
+        npi = newNpi;
     }
 
     // Add a new patient to the prescriber's list using a given key and address and create a new patient account
@@ -39,6 +45,20 @@ contract Prescriber{
         _patientContracts[oldKey] = address(0x0);
     }
 
+    function newPrescription(bytes32 patientKey, uint32 _ndc, uint _quantity, uint _refills) external onlyOwner{
+        
+        require(_patientContracts[patientKey] != address(0x0));
+        
+        address newContract = address(new Prescription(
+            address(this), 
+            _patientContracts[patientKey],
+            _ndc,
+            _quantity,
+            _refills));
+
+        _patientPrescriptions[_patientContracts[patientKey]].push(newContract);
+    }
+
     // Set the number of refills for a given prescription contract
     function setRefills(address rxAddress, uint refillCount) external onlyOwner{
 
@@ -46,11 +66,11 @@ contract Prescriber{
 
     // View the status of a given prescription contract
     function viewRx(address rxAddress) external onlyOwner{
-
+        
     }
 
     // View the history of a given patient contract if permissioned
-    function viewHistory(address patientAddress) external onlyOwner{
-
+    function viewHistory(bytes32 _patientKey) external onlyOwner view returns(address[] memory){
+        return _patientPrescriptions[_patientContracts[_patientKey]];
     }
 }
