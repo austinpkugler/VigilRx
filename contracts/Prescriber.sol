@@ -82,7 +82,7 @@ contract Prescriber{
     // View the status of a given prescription contract
     function viewRx(address rxAddress) external onlyOwner returns(PrescriptionInfo memory){
         tempRx = Prescription(rxAddress);
-        tempRx.viewScript();
+        return tempRx.viewScript();
     }
 
     // View the history of a given patient contract if permissioned
