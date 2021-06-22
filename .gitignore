@@ -131,3 +131,6 @@ dmypy.json
 # Ganache
 node_modules/
 package-lock.json
+
+# Django
+migrations/

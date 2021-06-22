@@ -25,7 +25,6 @@ def compile():
     }
 
     contracts = os.listdir(os.path.join('contracts'))
-    print(contracts)
     for contract in contracts:
         with open(os.path.join('contracts', contract)) as file:
             source = file.read()
@@ -48,8 +47,8 @@ def compile():
 def deploy():
     contracts, compiled_sol = compile()
 
-    w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
-    w3.eth.default_account = w3.eth.accounts[0]
+    # w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
+    # w3.eth.default_account = w3.eth.accounts[0]
 
     print(f'Status: Deploying {len(contracts)} contracts')
     for contract in contracts:
@@ -57,11 +56,13 @@ def deploy():
             name = contract.replace('.sol', '')
             bytecode = compiled_sol['contracts'][contract][name]['evm']['bytecode']['object']
             abi = json.loads(compiled_sol['contracts'][contract][name]['metadata'])['output']['abi']
-            Contract = w3.eth.contract(abi=abi, bytecode=bytecode)
-            tx_hash = Contract.constructor().transact()
-            tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-            deployed_contract = w3.eth.contract(address=tx_receipt.contractAddress, abi=abi)
-            print(f'Success: Deployed {contract} at address {deployed_contract.address}')
+            with open(os.path.join('contracts', name + '.abi'), 'w') as file:
+                json.dump(abi, file, indent=4)
+            # Contract = w3.eth.contract(abi=abi, bytecode=bytecode)
+            # tx_hash = Contract.constructor().transact()
+            # tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+            # deployed_contract = w3.eth.contract(address=tx_receipt.contractAddress, abi=abi)
+            # print(f'Success: Deployed {contract} at address {deployed_contract.address}')
         except Exception as e:
             print(f'Error: Deployment failed on {contract}\n\t{e}')
 

@@ -1,6 +1,7 @@
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
+from . import bridge
 from .forms import PrescriptionForm
 
 
@@ -37,13 +38,13 @@ def about(request):
     return render(request, 'feed/about.html', {'title': 'About'})
 
 
+@login_required
 def prescribe(request):
     if request.method == 'POST':
         form = PrescriptionForm(request.POST)
         if form.is_valid():
-            print(f'{form.cleaned_data}')
-            # Create prescription contract from prescriber
-        return HttpResponseRedirect('')
+            bridge.create_prescription(form.cleaned_data)
+        return redirect('feed-home')
     else:
         form = PrescriptionForm()
     return render(request, 'feed/prescribe.html', {'title': 'New Prescription', 'form': form})
