@@ -57,20 +57,19 @@ contract Prescriber{
     }
 
     // Create a new Prescription contract assigned to a given user.
-    function newPrescription(bytes32 patientKey, uint32 _ndc, uint _quantity, uint _refills) external onlyOwner{
-        // Make sure mapping is not currently empty
-        require(_patientContracts[patientKey] != address(0x0));
+    function newPrescription(address _patientAddress, uint32 _ndc, uint _quantity, uint _refills) external onlyOwner returns(address){
         
         // Create the new prescription and store the address
         address newContract = address(new Prescription(
-            address(this), 
-            _patientContracts[patientKey],
+            _patientAddress,
             _ndc,
             _quantity,
             _refills));
 
         // Push the new address on to this patient's Rx contract list
-        _patientPrescriptions[_patientContracts[patientKey]].push(newContract);
+        _patientPrescriptions[_patientAddress].push(newContract);
+
+        return newContract;
     }
 
     // Set the number of refills for a given prescription contract
