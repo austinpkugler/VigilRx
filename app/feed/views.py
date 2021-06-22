@@ -26,4 +26,5 @@ def prescribe(request):
         return redirect('feed-home')
     else:
         form = PrescriptionForm()
-    return render(request, 'feed/prescribe.html', {'title': 'New Prescription', 'form': form})
+    context = {'title': 'New Prescription', 'form': form}
+    return render(request, 'feed/prescribe.html', context)
