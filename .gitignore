@@ -132,3 +132,7 @@ dmypy.json
 # Ganache
 node_modules/
 package-lock.json
+
+# Solidity
+*.abi
+*.bin
