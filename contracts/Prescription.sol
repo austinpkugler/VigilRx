@@ -19,7 +19,6 @@ struct PrescriptionInfo {
 
 // Prescription storage and access control script
 contract Prescription {
-    
     // Declare a new Rx data handler
     PrescriptionInfo p;
 

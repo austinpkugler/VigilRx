@@ -28,27 +28,25 @@ contract Prescriber{
 
     // Only owner may execute
     modifier onlyOwner {
-    require(msg.sender == owner);
-    _;
+        require(msg.sender == owner);
+        _;
     }
 
     // Initiate the contract with a given contract owner address and NPI
-    constructor(address contractOwner, uint32 newNpi){
-        owner = contractOwner;
+    constructor(address contractOwner, uint32 newNpi) {
+        owner = msg.sender;
         npi = newNpi;
     }
 
     // Add a new patient to the prescriber's list using a given key and address and create a new patient account
-    function addPatient(bytes32 key, address pAddress) external onlyOwner{
-        
+    function addPatient(bytes32 key, address pAddress) external onlyOwner {
         // If key doesn't already exist then create a new one
         require(_patientContracts[key] == address(0x0));
         _patientContracts[key] = pAddress;
     }
 
     // Modify the key assigned to a given patient in the mapping (per HIPAA requirement to be able to amend)
-    function rekeyPatient(bytes32 oldKey, bytes32 newKey, address pAddress) external onlyOwner{
-        
+    function rekeyPatient(bytes32 oldKey, bytes32 newKey, address pAddress) external onlyOwner {
         // If the old key currently exists and the new one is empty then rekey the patient
         require(_patientContracts[oldKey] == pAddress);
         require(_patientContracts[newKey] == address(0x0));
@@ -57,14 +55,17 @@ contract Prescriber{
     }
 
     // Create a new Prescription contract assigned to a given user.
-    function newPrescription(address _patientAddress, uint32 _ndc, uint _quantity, uint _refills) external onlyOwner returns(address){
-        
+    function newPrescription(address _patientAddress, uint32 _ndc, uint _quantity, uint _refills) external onlyOwner returns(address) {
+
         // Create the new prescription and store the address
-        address newContract = address(new Prescription(
-            _patientAddress,
-            _ndc,
-            _quantity,
-            _refills));
+        address newContract = address(
+            new Prescription(
+                _patientAddress,
+                _ndc,
+                _quantity,
+                _refills
+            )
+        );
 
         // Push the new address on to this patient's Rx contract list
         _patientPrescriptions[_patientAddress].push(newContract);
@@ -73,19 +74,19 @@ contract Prescriber{
     }
 
     // Set the number of refills for a given prescription contract
-    function setRefills(address rxAddress, uint refillCount) external onlyOwner{
+    function setRefills(address rxAddress, uint refillCount) external onlyOwner {
         tempRx = Prescription(rxAddress);
         tempRx.setRefills(refillCount);
     }
 
     // View the status of a given prescription contract
-    function viewRx(address rxAddress) external onlyOwner returns(PrescriptionInfo memory){
+    function viewRx(address rxAddress) external onlyOwner returns(PrescriptionInfo memory) {
         tempRx = Prescription(rxAddress);
         return tempRx.viewScript();
     }
 
     // View the history of a given patient contract if permissioned
-    function viewHistory(bytes32 _patientKey) external onlyOwner view returns(address[] memory){
+    function viewHistory(bytes32 _patientKey) external onlyOwner view returns(address[] memory) {
         return _patientPrescriptions[_patientContracts[_patientKey]];
     }
 }
