@@ -28,6 +28,12 @@ Install Python dependences:
 pip install -r requirements.txt
 ```
 
+Install and run Ganache (Linux)
+```
+npm install ganache-cli web3
+node_modules/.bin/ganache-cli
+```
+
 ## Other Helpful Commands
 Create a Django superuser:
 ```
