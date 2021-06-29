@@ -7,16 +7,16 @@ from VigilRx.bridge.errors import NotCompiledException
 
 
 try:
-    with open(os.path.join('..', 'build', 'Patient.abi'), 'r') as file:
-        PATIENT_ABI = json.load(file)
-    with open(os.path.join('..', 'build', 'Patient.bin'), 'r') as file:
-        PATIENT_BIN = file.read()
+    with open(os.path.join('build', 'Patient.abi'), 'r') as file:
+        _PATIENT_ABI = json.load(file)
+    with open(os.path.join('build', 'Patient.bin'), 'r') as file:
+        _PATIENT_BIN = file.read()
 except Exception as e:
     raise NotCompiledException()
 
 
-def new_patient():
-    pass
+def new_patient(instance):
+    print(f'Patient(instance={instance}, role={instance.role}, address={instance.address})')
 
 
 def view_history():

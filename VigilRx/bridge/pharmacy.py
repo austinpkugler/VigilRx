@@ -7,13 +7,13 @@ from VigilRx.bridge.errors import NotCompiledException
 
 
 try:
-    with open(os.path.join('..', 'build', 'Pharmacy.abi'), 'r') as file:
-        PHARMACY_ABI = json.load(file)
-    with open(os.path.join('..', 'build', 'Pharmacy.bin'), 'r') as file:
-        PHARMACY_BIN = file.read()
+    with open(os.path.join('build', 'Pharmacy.abi'), 'r') as file:
+        _PHARMACY_ABI = json.load(file)
+    with open(os.path.join('build', 'Pharmacy.bin'), 'r') as file:
+        _PHARMACY_BIN = file.read()
 except Exception as e:
     raise NotCompiledException()
 
 
-def new_pharmacy():
-    pass
+def new_pharmacy(instance):
+    print(f'Pharmacy(instance={instance}, role={instance.role}, address={instance.address})')

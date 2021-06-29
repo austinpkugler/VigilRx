@@ -5,7 +5,8 @@ import os
 import solc
 
 
-os.mkdir(os.path.join('build'))
+if not os.path.exists('build'):
+    os.mkdir(os.path.join('build'))
 
 
 def clean() -> None:
@@ -66,8 +67,9 @@ def run_app() -> None:
 def run_ganache() -> None:
     """Runs the Ganache blockchain locally.
     """
-    ganache_path = os.path.join('..', 'node_modules', '.bin', 'ganache-cli')
-    os.system(f'{ganache_path}')
+    # ganache_path = os.path.join('node_modules', '.bin', 'ganache-cli')
+    # os.system(f'{ganache_path}')
+    pass
 
 
 if __name__ == '__main__':
