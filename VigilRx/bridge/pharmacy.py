@@ -3,7 +3,7 @@ import os
 
 from web3 import Web3
 
-from errors import NotCompiledException
+from VigilRx.bridge.errors import NotCompiledException
 
 
 try:

@@ -4,7 +4,7 @@ import os
 
 from web3 import Web3
 
-from errors import NotCompiledException, GanacheException
+from VigilRx.bridge.errors import NotCompiledException, GanacheException
 
 
 try:
