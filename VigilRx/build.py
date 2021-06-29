@@ -5,6 +5,9 @@ import os
 import solc
 
 
+os.mkdir(os.path.join('build'))
+
+
 def clean() -> None:
     """Removes all files in the build directory.
     """
