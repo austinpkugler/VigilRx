@@ -67,9 +67,8 @@ def run_app() -> None:
 def run_ganache() -> None:
     """Runs the Ganache blockchain locally.
     """
-    # ganache_path = os.path.join('node_modules', '.bin', 'ganache-cli')
-    # os.system(f'{ganache_path}')
-    pass
+    ganache_path = os.path.join('..', 'node_modules', '.bin', 'ganache-cli')
+    os.system(f'{ganache_path}')
 
 
 if __name__ == '__main__':
