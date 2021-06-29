@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
-from .forms import CustomUserForm
+from .forms import CustomUserForm, CustomUserUpdateForm
 
 
 def register(request):
@@ -17,10 +17,18 @@ def register(request):
     else:
         form = CustomUserForm()
 
-    context = {'form': form}
-    return render(request, 'users/register.html', context)
+    return render(request, 'users/register.html', {'form': form})
 
 
 @login_required
 def account(request):
-    return render(request, 'users/account.html')
+    if request.method == 'POST':
+        form = CustomUserUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('account')
+    else:
+        form = CustomUserUpdateForm(instance=request.user)
+
+    return render(request, 'users/account.html', {'form': form})
