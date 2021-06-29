@@ -10,7 +10,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: #5e69ee;
+  color: #333333;
 }
 
 ul {
@@ -42,7 +42,7 @@ ul {
 }
 
 .article-title {
-  color: #5e69ee;
+  color: #333333;
 }
 
 a.article-title:hover {
@@ -67,7 +67,7 @@ a.article-title:hover {
 }
 
 .article-metadata a:hover {
-  color: #333;
+  color: #333333;
   text-decoration: none;
 }
 
