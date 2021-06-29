@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--o0tf$-m2g18#m9ugbn-x^8+-$eb)m)+&&nnjtap3&zl=r3dt1'
+SECRET_KEY = 'django-insecure-(3msgvd=!b$&da2@p%cg20g3=2h$of=s^o*yrgjdz!g4s#u^8p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,15 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'feed.apps.FeedConfig',
-    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crispy_forms',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -127,8 +125,4 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-LOGIN_REDIRECT_URL = 'feed-home'
-LOGIN_URL = 'login'
-PRESCRIBE_URL = 'login'
+AUTH_USER_MODEL = 'users.CustomUser'
