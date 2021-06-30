@@ -31,7 +31,7 @@ VigilRx/VigilRx> python build.py --action=compile
 
 Run Django web server:
 ```
-VigilRx/VigilRx> python build.py --action=app
+VigilRx/VigilRx> python build.py --action=runserver
 ```
 
 ## Other Helpful Commands
