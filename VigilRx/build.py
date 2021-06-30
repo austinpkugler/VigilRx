@@ -2,11 +2,9 @@ import argparse
 import json
 import os
 
+from web3 import Web3
+
 import solc
-
-
-if not os.path.exists('build'):
-    os.mkdir(os.path.join('build'))
 
 
 def clean() -> None:
@@ -20,6 +18,9 @@ def clean() -> None:
 def compile() -> None:
     """Compiles all Solidity contracts in the contracts directory.
     """
+    if not os.path.exists('build'):
+        os.mkdir(os.path.join('build'))
+
     standard_json = {
         'language': 'Solidity',
         'sources': {},

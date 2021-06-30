@@ -1,0 +1,2 @@
+PORT = 'http://localhost:8545'
+GRC = '0x5Dd77d27Ee3c1DbF5832B01A6579AD9d4D58a18a'
