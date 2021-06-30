@@ -32,9 +32,11 @@ contract Registrar {
     /// @param patientAddress The public address of the new patient
     /// @return The address of the newly generated patient contract
     function createPatient(address patientAddress) external onlyOwner returns(address) {
-        contractStatus[patientAddress] = 1;
         address patient = address(new Patient(patientAddress));
+        contractStatus[patient] = 1;
+
         emit NewAddress(patient);
+
         return patient;
     }
 
@@ -42,18 +44,20 @@ contract Registrar {
     /// @param prescriberAddress The public address of the new prescriber
     /// @return The address of the newly generated prescriber contract
     function createPrescriber(address prescriberAddress, uint40 npi) external onlyOwner returns(address) {
-        contractStatus[prescriberAddress] = 2;
+        address prescriber = address(new Prescriber(prescriberAddress, npi));
+        contractStatus[prescriber] = 2;
 
-        return address(new Prescriber(prescriberAddress, npi));
+        return prescriber;
     }
 
     /// @notice Create a new pharmacy contract
     /// @param pharmacyAddress The public address of the new pharmacy
     /// @return The address of the newly generated pharmacy contract
     function createPharmacy(address pharmacyAddress, uint40 npi) external onlyOwner returns(address) {
-        contractStatus[pharmacyAddress] = 3;
+        address pharmacy = address(new Pharmacy(pharmacyAddress, npi));
+        contractStatus[pharmacy] = 3;
 
-        return address(new Pharmacy(pharmacyAddress, npi));
+        return pharmacy;
     }
 
     /// @notice Create a new pharmacy contract

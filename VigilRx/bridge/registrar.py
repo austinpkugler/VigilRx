@@ -18,6 +18,7 @@ except Exception as e:
 w3 = Web3(Web3.HTTPProvider(PORT))
 w3.eth.default_account = w3.eth.accounts[0]
 
+print(w3.eth.accounts[0])
 
 def new_registrar():
     contract = w3.eth.contract(abi=_REGISTRAR_ABI, bytecode=_REGISTRAR_BIN)
@@ -26,7 +27,8 @@ def new_registrar():
     registrar_contract = w3.eth.contract(address=tx_receipt.contractAddress, abi=_REGISTRAR_ABI)
     print(f'Registrar(instance={registrar_contract}, role=Registrar, address={registrar_contract.address})')
     return registrar_contract.address
-# new_registrar()
+ 
+#new_registrar()
 
 def new_patient(instance):
     registrar_contract = w3.eth.contract(address=GRC, abi=_REGISTRAR_ABI)
