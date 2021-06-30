@@ -40,7 +40,6 @@ toolz==0.11.1
 typing-extensions==3.10.0.0
 urllib3==1.26.6
 varint==1.0.2
--e git+https://github.com/austinpkugler/VigilRx.git@74a1d361e02bb317abf7b3b9cc23b54ab9994096#egg=VigilRx
 web3==5.20.0
 websockets==8.1
 yarl==1.6.3
