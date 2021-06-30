@@ -31,11 +31,11 @@ contract Registrar {
     /// @notice Create a new patient contract
     /// @param patientAddress The public address of the new patient
     /// @return The address of the newly generated patient contract
-    function createPatient(address patientAddress) external onlyOwner returns(address) {
-        address patient = address(new Patient(patientAddress));
-        contractStatus[patient] = 1;
+    function createPatient(address patientAddress) external onlyOwner returns(Patient) {
+        Patient patient = new Patient(patientAddress);
+        contractStatus[address(patient)] = 1;
 
-        emit NewAddress(patient);
+        emit NewAddress(address(patient));
 
         return patient;
     }
@@ -43,9 +43,9 @@ contract Registrar {
     /// @notice Create a new prescriber contract
     /// @param prescriberAddress The public address of the new prescriber
     /// @return The address of the newly generated prescriber contract
-    function createPrescriber(address prescriberAddress, uint40 npi) external onlyOwner returns(address) {
-        address prescriber = address(new Prescriber(prescriberAddress, npi));
-        contractStatus[prescriber] = 2;
+    function createPrescriber(address prescriberAddress, uint40 npi) external onlyOwner returns(Prescriber) {
+        Prescriber prescriber = new Prescriber(prescriberAddress, npi);
+        contractStatus[address(prescriber)] = 2;
 
         return prescriber;
     }
@@ -53,9 +53,9 @@ contract Registrar {
     /// @notice Create a new pharmacy contract
     /// @param pharmacyAddress The public address of the new pharmacy
     /// @return The address of the newly generated pharmacy contract
-    function createPharmacy(address pharmacyAddress, uint40 npi) external onlyOwner returns(address) {
-        address pharmacy = address(new Pharmacy(pharmacyAddress, npi));
-        contractStatus[pharmacy] = 3;
+    function createPharmacy(address pharmacyAddress, uint40 npi) external onlyOwner returns(Pharmacy) {
+        Pharmacy pharmacy = new Pharmacy(pharmacyAddress, npi);
+        contractStatus[address(pharmacy)] = 3;
 
         return pharmacy;
     }
