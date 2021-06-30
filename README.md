@@ -3,25 +3,35 @@
 ## Setup Commands
 Create and activate a Python environment (Linux):
 ```
-python3 -m venv env
-source env/bin/activate
+VigilRx> python3 -m venv env
+VigilRx> source env/bin/activate
 ```
 
 Create and activate Python environment (Windows):
 ```
-python3 -m venv env
-source env\Scripts\activate.bat
+VigilRx> python3 -m venv env
+VigilRx> source env\Scripts\activate.bat
 ```
 
 Install Python dependences:
 ```
-pip install -r requirements.txt
+VigilRx> pip install -r requirements.txt
 ```
 
 Install and run Ganache (Linux):
 ```
-npm install ganache-cli web3
-node_modules/.bin/ganache-cli
+VigilRx> npm install ganache-cli web3
+VigilRx> node_modules/.bin/ganache-cli
+```
+
+Compile Solidity smart contracts:
+```
+VigilRx/VigilRx> python build.py --action=compile
+```
+
+Run Django web server:
+```
+VigilRx/VigilRx> python build.py --action=app
 ```
 
 ## Other Helpful Commands

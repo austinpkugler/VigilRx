@@ -3,7 +3,7 @@ import os
 
 from web3 import Web3
 
-from VigilRx.bridge.errors import NotCompiledException
+from errors import NotCompiledException
 
 
 try:
@@ -12,8 +12,5 @@ try:
     with open(os.path.join('build', 'Pharmacy.bin'), 'r') as file:
         _PHARMACY_BIN = file.read()
 except Exception as e:
-    raise NotCompiledException()
-
-
-def new_pharmacy(instance):
-    print(f'Pharmacy(instance={instance}, role={instance.role}, address={instance.address})')
+    # raise NotCompiledException()
+    print('fail')
