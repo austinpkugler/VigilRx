@@ -57,13 +57,6 @@ def compile() -> None:
             file.write(bytecode)
 
 
-def run_app() -> None:
-    """Runs the VigilRx web application locally.
-    """
-    web_app_path = os.path.join('app', 'manage.py')
-    os.system(f'python3 {web_app_path} runserver')
-
-
 def run_ganache() -> None:
     """Runs the Ganache blockchain locally.
     """
@@ -71,17 +64,23 @@ def run_ganache() -> None:
     os.system(f'{ganache_path}')
 
 
+def run_server() -> None:
+    """Runs the VigilRx Django web server locally.
+    """
+    web_app_path = os.path.join('app', 'manage.py')
+    os.system(f'python3 {web_app_path} runserver')
+
+
 if __name__ == '__main__':
     ACTIONS = {
         'clean': clean,
         'compile': compile,
-        'app': run_app,
         'ganache': run_ganache,
+        'runserver': run_server,
     }
 
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--action', choices=ACTIONS.keys(), required=True)
     args = argparser.parse_args()
-
     function = ACTIONS[args.action]
     function()

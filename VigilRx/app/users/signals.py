@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from .models import CustomUser
 
 curr_dir = os.path.dirname(__file__)
-bridge_dir = os.path.abspath(os.path.join(curr_dir, '../../bridge'))
+bridge_dir = os.path.abspath(os.path.join(curr_dir, os.path.join('..', '..', 'bridge')))
 sys.path.append(bridge_dir)
 from registrar import new_patient, new_prescriber, new_pharmacy
 

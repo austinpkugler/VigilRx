@@ -12,8 +12,7 @@ try:
     with open(os.path.join('build', 'Prescriber.bin'), 'r') as file:
         _PRESCRIBER_BIN = file.read()
 except Exception as e:
-    # raise NotCompiledException()
-    print('fail')
+    raise NotCompiledException()
 
 
 def new_prescription():

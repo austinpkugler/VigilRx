@@ -12,5 +12,4 @@ try:
     with open(os.path.join('build', 'Pharmacy.bin'), 'r') as file:
         _PHARMACY_BIN = file.read()
 except Exception as e:
-    # raise NotCompiledException()
-    print('fail')
+    raise NotCompiledException()

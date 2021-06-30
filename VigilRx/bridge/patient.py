@@ -12,8 +12,7 @@ try:
     with open(os.path.join('build', 'Patient.bin'), 'r') as file:
         _PATIENT_BIN = file.read()
 except Exception as e:
-    print('fail')
-    # raise NotCompiledException()
+    raise NotCompiledException()
 
 
 def view_history():
