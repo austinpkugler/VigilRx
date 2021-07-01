@@ -30,34 +30,29 @@ contract Registrar {
 
     /// @notice Create a new patient contract
     /// @param patientAddress The public address of the new patient
-    /// @return The address of the newly generated patient contract
-    function createPatient(address patientAddress) external onlyOwner returns(Patient) {
+    function createPatient(address patientAddress) external onlyOwner {
         Patient patient = new Patient(patientAddress);
         contractStatus[address(patient)] = 1;
 
         emit NewAddress(address(patient));
-
-        return patient;
     }
 
     /// @notice Create a new prescriber contract
     /// @param prescriberAddress The public address of the new prescriber
-    /// @return The address of the newly generated prescriber contract
-    function createPrescriber(address prescriberAddress, uint40 npi) external onlyOwner returns(Prescriber) {
+    function createPrescriber(address prescriberAddress, uint40 npi) external onlyOwner {
         Prescriber prescriber = new Prescriber(prescriberAddress, npi);
         contractStatus[address(prescriber)] = 2;
 
-        return prescriber;
+        emit NewAddress(address(prescriber));
     }
 
     /// @notice Create a new pharmacy contract
     /// @param pharmacyAddress The public address of the new pharmacy
-    /// @return The address of the newly generated pharmacy contract
-    function createPharmacy(address pharmacyAddress, uint40 npi) external onlyOwner returns(Pharmacy) {
+    function createPharmacy(address pharmacyAddress, uint40 npi) external onlyOwner {
         Pharmacy pharmacy = new Pharmacy(pharmacyAddress, npi);
         contractStatus[address(pharmacy)] = 3;
 
-        return pharmacy;
+        emit NewAddress(address(pharmacy));
     }
 
     /// @notice Create a new pharmacy contract
@@ -71,6 +66,10 @@ contract Registrar {
         return false;
     }
 
+    /// @notice Explain to an end user what this does
+
+    /// @param contractAddress The public address of the prescriber 
+    /// @return The address of the newly genereated prescriber contract
     function isPrescriber(address contractAddress) external view returns(bool) {
         if(contractStatus[contractAddress] == 2) {
             return true;

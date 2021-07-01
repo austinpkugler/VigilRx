@@ -13,17 +13,25 @@ contract Patient {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "Request not sent by owner.");
         _;
     }
 
     modifier onlyPermissioned {
-        require(msg.sender == owner || permissioned[msg.sender] == true);
+        require(msg.sender == owner || permissioned[msg.sender] == true, "Requester is not permissioned.");
         _;
     }
 
     function viewHistory() external view onlyPermissioned returns(address[] memory) {
         return prescriptions;
+    }
+
+    function addPrescription(address contractAddress) public onlyPermissioned {
+        prescriptions.push(contractAddress);
+    }
+
+    function isPermissioned(address party) public view onlyPermissioned returns(bool) {
+        return true;
     }
 
     function addPermissioned(address party) public onlyOwner {
