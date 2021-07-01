@@ -26,9 +26,11 @@ def new_patient(instance):
     registrar_contract = w3.eth.contract(address=config.GRC, abi=_REGISTRAR_ABI)
     tx_hash = registrar_contract.functions.createPatient(instance.address).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    print('\n\n', registrar_contract.events.NewAddress().processReceipt(tx_receipt))
-    # print(f'Patient(instance={instance}, role={instance.role}, address={instance.address}, contract={patient_address})')
-    # return patient_address
+
+    patient_contract = str(registrar_contract.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
+
+    print(f'Patient(instance={instance}, role={instance.role}, address={instance.address}, contract={patient_contract})')
+    return patient_contract
 
 
 def new_pharmacy(instance):
