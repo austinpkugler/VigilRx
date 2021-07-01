@@ -1,16 +1,10 @@
 # VigilRx
 
-## Setup Commands
-Create and activate a Python environment (Linux):
+## Setup Commands (Linux)
+Create and activate a Python environment:
 ```
 VigilRx> python3 -m venv env
 VigilRx> source env/bin/activate
-```
-
-Create and activate Python environment (Windows):
-```
-VigilRx> python3 -m venv env
-VigilRx> source env\Scripts\activate.bat
 ```
 
 Install Python dependences:
@@ -18,42 +12,12 @@ Install Python dependences:
 VigilRx> pip install -r requirements.txt
 ```
 
-Install and run Ganache (Linux):
+Install Ganache:
 ```
 VigilRx> npm install ganache-cli web3
-VigilRx> node_modules/.bin/ganache-cli
 ```
 
-Compile Solidity smart contracts:
+Build and run VigilRx:
 ```
-VigilRx/VigilRx> python build.py --action=compile
-```
-
-Run Django web server:
-```
-VigilRx/VigilRx> python build.py --action=runserver
-```
-
-## Other Helpful Commands
-Create a Django superuser:
-```
-python manage.py createsuperuser
-```
-
-Test migrations before making:
-```
-python manage.py makemigrations --dry-run
-```
-
-Make and apply Django migrations:
-```
-python manage.py makemigrations
-python manage.py migrate
-```
-
-Install solc:
-```
-sudo add-apt-repository ppa:ethereum/ethereum
-sudo apt-get update
-sudo apt-get install solc
+VigilRx/VigilRx> python cli.py --action=build
 ```

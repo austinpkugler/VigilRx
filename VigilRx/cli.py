@@ -5,20 +5,9 @@ import time
 
 import solc
 
-# from bridge.registrar import new_registrar
-# /home/user/Documents/reu/VigilRx/VigilRx 
-# 
 
-def clean() -> None:
-    """Removes all files in the build directory.
-    """
-    files = os.listdir(os.path.join('build'))
-    for file in files:
-        os.remove(os.path.join('build', file))
-
-
-def compile() -> None:
-    """Compiles all Solidity contracts in the contracts directory.
+def compile():
+    """Compiles all Solidity smart contracts.
     """
     if not os.path.exists('build'):
         os.mkdir(os.path.join('build'))
@@ -60,47 +49,58 @@ def compile() -> None:
             file.write(bytecode)
 
 
-def run_ganache() -> None:
-    """Runs the Ganache blockchain locally.
+def clean():
+    """Removes all Solidity smart contract compilation files.
     """
-    ganache_path = os.path.join('..', 'node_modules', '.bin', 'ganache-cli')
-    os.system(f'gnome-terminal -- {ganache_path}')
+    files = os.listdir(os.path.join('build'))
+    for file in files:
+        os.remove(os.path.join('build', file))
 
 
-def run_server() -> None:
-    """Runs the VigilRx Django web server locally.
+def run_ganache():
+    """Runs the Ganache test blockchain locally. Solidity smart
+    contracts must be compiled first.
     """
-    web_app_path = os.path.join('app', 'manage.py')
-    os.system(f'gnome-terminal -- python3 {web_app_path} runserver')
+    path = os.path.join('..', 'node_modules', '.bin', 'ganache-cli')
+    os.system(f'gnome-terminal -- {path}')
 
 
-def registrar() -> None:
-    """Deploys a new registrar contract.
+def run_server():
+    """Runs the Django web app server locally. Ganache must be running
+    and a Registrar smart contract deployed.
     """
-    deploy_path = os.path.join('bridge', 'deploy.py')
-    os.system(f'python {deploy_path}')
+    path = os.path.join('app', 'manage.py')
+    os.system(f'gnome-terminal -- python3 {path} runserver')
 
 
-def deploy() -> None:
-    """Deploys and runs the entire app.
+def bridge():
+    """Deploys a new registrar contract. Ganache must be running.
     """
+    path = os.path.join('bridge', 'bridge.py')
+    os.system(f'gnome-terminal -- python {path}')
+
+
+def build():
+    """Compiles all Solidity smart contracts, runs the Ganache test
+    blockchain locally, deploys a new registrar contract, and runs the
+    Django web app server locally.
+    """
+    clean()
     compile()
-    time.sleep(3)
     run_ganache()
     time.sleep(3)
-    registrar()
-    time.sleep(3)
+    bridge()
     run_server()
 
 
 if __name__ == '__main__':
     ACTIONS = {
-        'clean': clean,
         'compile': compile,
-        'ganache': run_ganache,
+        'clean': clean,
         'runserver': run_server,
-        'registrar': registrar,
-        'deploy': deploy,
+        'runganache': run_ganache,
+        'bridge': bridge,
+        'build': build,
     }
 
     argparser = argparse.ArgumentParser()

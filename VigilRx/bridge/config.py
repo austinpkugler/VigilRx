@@ -1,2 +1,0 @@
-PORT = 'http://localhost:8545'
-GRC = '0xDe02aFa63427e948ca5cD7Ee546d4250A83C75D5'

@@ -3,27 +3,26 @@ import os
 
 from web3 import Web3
 
-import config
 import errors
 
 
 try:
     with open(os.path.join('build', 'Registrar.abi'), 'r') as file:
         _REGISTRAR_ABI = json.load(file)
-    with open(os.path.join('build', 'Registrar.bin'), 'r') as file:
-        _REGISTRAR_BIN = file.read()
+    with open(os.path.join('build', 'bridge.json'), 'r') as file:
+        _GRC_ADDRESS = json.load(file)['grc_address']
 except Exception as e:
     raise errors.NotCompiledException()
 
 try:
-    w3 = Web3(Web3.HTTPProvider(config.PORT))
+    w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
     w3.eth.default_account = w3.eth.accounts[0]
 except:
     raise errors.GanacheException()
 
 
 def new_patient(instance):
-    registrar_contract = w3.eth.contract(address=config.GRC, abi=_REGISTRAR_ABI)
+    registrar_contract = w3.eth.contract(address=_GRC_ADDRESS, abi=_REGISTRAR_ABI)
     tx_hash = registrar_contract.functions.createPatient(instance.address).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
 
