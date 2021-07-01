@@ -3,7 +3,7 @@ import os
 
 from web3 import Web3
 
-from errors import NotCompiledException
+import errors
 
 
 try:
@@ -12,7 +12,7 @@ try:
     with open(os.path.join('build', 'Patient.bin'), 'r') as file:
         _PATIENT_BIN = file.read()
 except Exception as e:
-    raise NotCompiledException()
+    raise errors.NotCompiledException()
 
 
 def view_history():

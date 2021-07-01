@@ -24,7 +24,7 @@ contract Registrar {
 
     /// @notice Require that the sending of the transactions be the contract owner
     modifier onlyOwner() {
-        assert(msg.sender == owner);
+        require(msg.sender == owner, "Requester is not owner: reverted");
         _;
     }
 

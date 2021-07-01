@@ -3,7 +3,7 @@ import os
 
 from web3 import Web3
 
-from errors import NotCompiledException, GanacheException
+import errors
 
 
 try:
@@ -12,7 +12,7 @@ try:
     with open(os.path.join('build', 'Prescriber.bin'), 'r') as file:
         _PRESCRIBER_BIN = file.read()
 except Exception as e:
-    raise NotCompiledException()
+    raise errors.NotCompiledException()
 
 
 def new_prescription():

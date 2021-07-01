@@ -1,11 +1,13 @@
 import argparse
 import json
 import os
-
-from web3 import Web3
+import time
 
 import solc
 
+# from bridge.registrar import new_registrar
+# /home/user/Documents/reu/VigilRx/VigilRx 
+# 
 
 def clean() -> None:
     """Removes all files in the build directory.
@@ -44,8 +46,8 @@ def compile() -> None:
             standard_json['sources'][contract]['content'] = source
 
     compiled_sol = solc.compile_standard(standard_json)
-    # with open(os.path.join('build', 'contracts.json'), 'w') as file:
-    #     json.dump(compiled_sol, file, indent=4)
+    with open(os.path.join('build', 'contracts.json'), 'w') as file:
+        json.dump(compiled_sol, file, indent=4)
 
     for contract in contracts:
         name = contract.replace('.sol', '')
@@ -62,14 +64,33 @@ def run_ganache() -> None:
     """Runs the Ganache blockchain locally.
     """
     ganache_path = os.path.join('..', 'node_modules', '.bin', 'ganache-cli')
-    os.system(f'{ganache_path}')
+    os.system(f'gnome-terminal -- {ganache_path}')
 
 
 def run_server() -> None:
     """Runs the VigilRx Django web server locally.
     """
     web_app_path = os.path.join('app', 'manage.py')
-    os.system(f'python3 {web_app_path} runserver')
+    os.system(f'gnome-terminal -- python3 {web_app_path} runserver')
+
+
+def registrar() -> None:
+    """Deploys a new registrar contract.
+    """
+    deploy_path = os.path.join('bridge', 'deploy.py')
+    os.system(f'python {deploy_path}')
+
+
+def deploy() -> None:
+    """Deploys and runs the entire app.
+    """
+    compile()
+    time.sleep(3)
+    run_ganache()
+    time.sleep(3)
+    registrar()
+    time.sleep(3)
+    run_server()
 
 
 if __name__ == '__main__':
@@ -78,6 +99,8 @@ if __name__ == '__main__':
         'compile': compile,
         'ganache': run_ganache,
         'runserver': run_server,
+        'registrar': registrar,
+        'deploy': deploy,
     }
 
     argparser = argparse.ArgumentParser()
