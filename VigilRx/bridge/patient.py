@@ -13,15 +13,3 @@ try:
         _PATIENT_BIN = file.read()
 except Exception as e:
     raise errors.NotCompiledException()
-
-
-def view_history():
-    pass
-
-
-def add_permissioned():
-    pass
-
-
-def remove_permissioned():
-    pass
