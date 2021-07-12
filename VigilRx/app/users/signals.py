@@ -22,8 +22,9 @@ def create_contract(sender, instance, created, **kwargs):
             CustomUser.objects.filter(username=instance.username).update(contract=patient_contract)
         # Prescriber
         elif instance.role == 2:
-            contract = new_prescriber(instance)
+            prescriber_contract = new_prescriber(instance)
+            CustomUser.objects.filter(username=instance.username).update(contract=prescriber_contract)
         # Pharmacy
         elif instance.role == 3:
-            contract = new_pharmacy(instance)
-
+            pharmacy_contract = new_pharmacy(instance)
+            CustomUser.objects.filter(username=instance.username).update(contract=pharmacy_contract)
