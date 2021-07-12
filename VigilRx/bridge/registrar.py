@@ -27,7 +27,7 @@ def new_patient(instance):
     tx_hash = REGISTRAR_CONTRACT.functions.createPatient(instance.address).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     patient_contract = str(REGISTRAR_CONTRACT.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
-    print(f'Patient(role={instance.role}, address={instance.address}, contract={patient_contract})')
+    print(f'Patient(address={instance.address}, contract={patient_contract})')
     return patient_contract
 
 
@@ -35,7 +35,7 @@ def new_prescriber(instance):
     tx_hash = REGISTRAR_CONTRACT.functions.createPharmacy(instance.address, int(instance.identifier)).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     prescriber_contract = str(REGISTRAR_CONTRACT.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
-    print(f'Prescriber(role={instance.role}, address={instance.address}, contract={prescriber_contract}, identifier={instance.identifier}))')
+    print(f'Prescriber(address={instance.address}, contract={prescriber_contract}, identifier={instance.identifier}))')
     return prescriber_contract
 
 
@@ -43,5 +43,5 @@ def new_pharmacy(instance):
     tx_hash = REGISTRAR_CONTRACT.functions.createPharmacy(instance.address, int(instance.identifier)).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     pharmacy_contract = str(REGISTRAR_CONTRACT.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
-    print(f'Pharmacy(role={instance.role}, address={instance.address}, contract={pharmacy_contract}, identifier={instance.identifier})')
+    print(f'Pharmacy(address={instance.address}, contract={pharmacy_contract}, identifier={instance.identifier})')
     return pharmacy_contract
