@@ -1,40 +1,47 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "./Registrar.sol";
 
+/// @title Patient Role Contract
+/// @author Austin Kugler, Alixandra Taylor
+/// @notice The contract represents a patient in the system, handling permissioning
+///         checks and tracking assigned prescription contracts
 contract Patient {
-
+    /// @notice Contract owner and registrar contract addresses
     address owner;
-    mapping(address => bool) permissioned;
-    address[] prescriptions;
+    Registrar public registrarContract;
 
+    /// @notice Permissioned parties mapping, determines who is allowed certain actions
+    mapping(address => bool) public permissioned;
+
+    /// @notice List of current prescription contracts
+    address[] public prescriptions;
+
+    /// @notice Set owner to the patient's address upon creation
     constructor(address _patient) {
         owner = _patient;
+        registrarContract = Registrar(msg.sender);
     }
 
+    /// @notice Only the owner may perform the action
     modifier onlyOwner() {
         require(msg.sender == owner, "Request not sent by owner.");
         _;
     }
 
+    /// @notice Only a permissioned party may perform the action
     modifier onlyPermissioned {
         require(msg.sender == owner || permissioned[msg.sender] == true, "Requester is not permissioned.");
         _;
     }
 
-    function viewHistory() external view onlyPermissioned returns(address[] memory) {
-        return prescriptions;
-    }
-
     function addPrescription(address contractAddress) public onlyPermissioned {
+        require(registrarContract.isPrescriber(contractAddress), "Error: Requester is not registered as prescriber");
         prescriptions.push(contractAddress);
     }
 
-    function isPermissioned(address party) public view onlyPermissioned returns(bool) {
-        return true;
-    }
-
-    function addPermissioned(address party) public onlyOwner {
+    function addPermission(address party) public onlyOwner {
         if (permissioned[party] == false) {
             permissioned[party] = true;
         } else {
@@ -42,7 +49,7 @@ contract Patient {
         }
     }
 
-    function removePermissioned(address party) public onlyOwner {
+    function removePermission(address party) public onlyOwner {
         if (permissioned[party] == true) {
             permissioned[party] = false;
         } else {
@@ -50,4 +57,7 @@ contract Patient {
         }
     }
 
+    function isPermissioned() external view onlyPermissioned returns(bool) {
+        return true;
+    }
 }
