@@ -20,39 +20,28 @@ try:
 except:
     raise errors.GanacheException()
 
+REGISTRAR_CONTRACT = w3.eth.contract(address=_GRC_ADDRESS, abi=_REGISTRAR_ABI)
+
 
 def new_patient(instance):
-    registrar_contract = w3.eth.contract(address=_GRC_ADDRESS, abi=_REGISTRAR_ABI)
-    tx_hash = registrar_contract.functions.createPatient(instance.address).transact()
+    tx_hash = REGISTRAR_CONTRACT.functions.createPatient(instance.address).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-
-    patient_contract = str(registrar_contract.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
-
-    print(f'Patient(instance={instance}, role={instance.role}, address={instance.address}, contract={patient_contract})')
+    patient_contract = str(REGISTRAR_CONTRACT.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
+    print(f'Patient(role={instance.role}, address={instance.address}, contract={patient_contract})')
     return patient_contract
 
 
-def new_pharmacy(instance):
-    print(f'Pharmacy(instance={instance}, role={instance.role}, address={instance.address})')
-
-
 def new_prescriber(instance):
-    print(f'Prescriber(instance={instance}, role={instance.role}, address={instance.address})')
-    # """Deploys a new prescriber contract to the Ganache blockchain.
+    tx_hash = REGISTRAR_CONTRACT.functions.createPharmacy(instance.address, int(instance.identifier)).transact()
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    prescriber_contract = str(REGISTRAR_CONTRACT.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
+    print(f'Prescriber(role={instance.role}, address={instance.address}, contract={prescriber_contract}, identifier={instance.identifier}))')
+    return prescriber_contract
 
-    # :param prescriber_info: Dictionary of prescriber info, including a
-    #     personal address and National Provider Identifier.
-    # :type prescriber_info: dict
-    # :return: Address of now deployed prescriber contract.
-    # :rtype: str
-    # """
-    # try:
-    #     w3.eth.default_account = prescriber_info['address']
-    # except:
-    #     raise GanacheException()
 
-    # contract = w3.eth.contract(abi=_PRESCRIBER_ABI, bytecode=_PRESCRIBER_BIN)
-    # tx_hash = contract.constructor(prescriber_info['address'], int(prescriber_info['identifier'])).transact()
-    # tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    # prescriber_contract = w3.eth.contract(address=tx_receipt.contractAddress, abi=_PRESCRIBER_ABI)
-    # return prescriber_contract.address
+def new_pharmacy(instance):
+    tx_hash = REGISTRAR_CONTRACT.functions.createPharmacy(instance.address, int(instance.identifier)).transact()
+    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    pharmacy_contract = str(REGISTRAR_CONTRACT.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
+    print(f'Pharmacy(role={instance.role}, address={instance.address}, contract={pharmacy_contract}, identifier={instance.identifier})')
+    return pharmacy_contract
