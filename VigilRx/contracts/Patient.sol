@@ -42,7 +42,7 @@ contract Patient {
         prescriptions.push(contractAddress);
     }
 
-    function addPermission(address party) external onlyOwner {
+    function addPermissionedPrescriber(address party) external onlyOwner {
         if (permissioned[party] == false) {
             permissioned[party] = true;
         } else {
@@ -50,7 +50,7 @@ contract Patient {
         }
     }
 
-    function removePermission(address party) external onlyOwner {
+    function removePermissionedPrescriber(address party) external onlyOwner {
         if (permissioned[party] == true) {
             permissioned[party] = false;
         } else {
@@ -63,11 +63,11 @@ contract Patient {
     }
 
     function addPrescriptionPermissions(address prescriptionContract, address party) external onlyOwner {
-        Prescription(prescriptionContract).addPermissioned(party);
+        Prescription(prescriptionContract).addPermissionedPrescribered(party);
     }
     
     function removePrescriptionPermissions(address prescriptionContract) external onlyOwner {
-        Prescription(prescriptionContract).removePermissioned(prescriptionContract);
+        Prescription(prescriptionContract).removePermissionedPrescribered(prescriptionContract);
     }
 
     function isPermissioned() external view returns(bool) {

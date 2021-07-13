@@ -50,7 +50,7 @@ contract Prescription {
     }
 
     /// @notice Add a new permissioned party to this prescription (i.e. Pharmacist)
-    function addPermissioned(address party) external onlyOwner {
+    function addPermissionedPrescribered(address party) external onlyOwner {
         require(permissioned[party] == false, "Error: Party already permissioned.");
         require(registrarContract.isPharmacy(party) || registrarContract.isPrescriber(party), "Address is not registered");
 
@@ -58,7 +58,7 @@ contract Prescription {
     }
     
         /// @notice Add a new permissioned part to this prescription (i.e. Pharmacist)
-    function removePermissioned(address party) external onlyOwner {
+    function removePermissionedPrescribered(address party) external onlyOwner {
         require(permissioned[party] == true, "Error: Party is not permissioned.");
 
         permissioned[party] = false;
