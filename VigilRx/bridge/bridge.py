@@ -12,7 +12,7 @@ try:
     with open(os.path.join('build', 'Registrar.bin'), 'r') as file:
         _REGISTRAR_BIN = file.read()
 except Exception as e:
-    raise errors.NotCompiledException()
+    [raise errors.NotCompiledException()]
 
 try:
     w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
