@@ -32,7 +32,7 @@ def new_patient(instance):
 
 
 def new_prescriber(instance):
-    tx_hash = REGISTRAR_CONTRACT.functions.createPharmacy(instance.address, int(instance.identifier)).transact()
+    tx_hash = REGISTRAR_CONTRACT.functions.createPrescriber(instance.address, int(instance.identifier)).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     prescriber_contract = str(REGISTRAR_CONTRACT.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
     print(f'Prescriber(address={instance.address}, contract={prescriber_contract}, identifier={instance.identifier}))')
