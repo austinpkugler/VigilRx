@@ -15,7 +15,7 @@ contract Prescriber {
 
     uint40 public npi;
     address[] patients;
-    mapping(address => address[]) prescriptions;
+    mapping(address => address[]) public prescriptions;
 
     event NewAddress(address indexed contractAddress);
 
@@ -26,7 +26,7 @@ contract Prescriber {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "Error: Message sender is not owner");
         _;
     }
 

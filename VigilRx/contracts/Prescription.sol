@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "./Registrar.sol";
+import "./Patient.sol";
 
 /// @title Prescription
 /// @author Austin Kugler, Alixandra Taylor
@@ -21,7 +22,6 @@ contract Prescription {
     PrescriptionInfo public p;
 
     bool public fillSigRequired;
-    address private fillSigPharmacy;
 
     constructor(address _patientContract, address _registrarAddress, uint40 _ndc, uint8 _quantity, uint8 _refills) {
         owner = _patientContract;
@@ -35,26 +35,33 @@ contract Prescription {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "Requester is not owner.");
         _;
     }
 
     modifier onlyPrescriber() {
-        require(msg.sender == p.prescriber);
+        require(msg.sender == p.prescriber, "Requester is not prescriber.");
         _;
     }
 
     modifier onlyPermissioned {
-        require(msg.sender == p.prescriber || permissioned[msg.sender] == true);
+        require(msg.sender == p.prescriber || permissioned[msg.sender], "Requester is not permissioned.");
         _;
     }
 
-    /// @notice Add a new permissioned part to this prescription (i.e. Pharmacist)
+    /// @notice Add a new permissioned party to this prescription (i.e. Pharmacist)
     function addPermissioned(address party) external onlyOwner {
-        require(registrarContract.isPharmacy(party) || registrarContract.isPrescriber(party), "Address is not registered");
         require(permissioned[party] == false, "Error: Party already permissioned.");
+        require(registrarContract.isPharmacy(party) || registrarContract.isPrescriber(party), "Address is not registered");
 
         permissioned[party] = true;
+    }
+    
+        /// @notice Add a new permissioned part to this prescription (i.e. Pharmacist)
+    function removePermissioned(address party) external onlyOwner {
+        require(permissioned[party] == true, "Error: Party is not permissioned.");
+
+        permissioned[party] = false;
     }
 
     /// Multi-Sig Phase 1

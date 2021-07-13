@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "./Registrar.sol";
+import "./Prescription.sol";
 
 /// @title Patient Role Contract
 /// @author Austin Kugler, Alixandra Taylor
@@ -26,7 +27,7 @@ contract Patient {
 
     /// @notice Only the owner may perform the action
     modifier onlyOwner() {
-        require(msg.sender == owner, "Request not sent by owner.");
+        require(msg.sender == owner, "Requester is not owner.");
         _;
     }
 
@@ -36,12 +37,12 @@ contract Patient {
         _;
     }
 
-    function addPrescription(address contractAddress) public onlyPermissioned {
-        require(registrarContract.isPrescriber(contractAddress), "Error: Requester is not registered as prescriber");
+    function addPrescription(address contractAddress) external onlyPermissioned {
+        require(registrarContract.isPrescriber(msg.sender), "Error: Requester is not registered as prescriber");
         prescriptions.push(contractAddress);
     }
 
-    function addPermission(address party) public onlyOwner {
+    function addPermission(address party) external onlyOwner {
         if (permissioned[party] == false) {
             permissioned[party] = true;
         } else {
@@ -49,7 +50,7 @@ contract Patient {
         }
     }
 
-    function removePermission(address party) public onlyOwner {
+    function removePermission(address party) external onlyOwner {
         if (permissioned[party] == true) {
             permissioned[party] = false;
         } else {
@@ -57,7 +58,24 @@ contract Patient {
         }
     }
 
-    function isPermissioned() external view onlyPermissioned returns(bool) {
-        return true;
+    function requestFill(address prescriptionContract) external onlyOwner {
+        Prescription(prescriptionContract).requestFill();
+    }
+
+    function addPrescriptionPermissions(address prescriptionContract, address party) external onlyOwner {
+        Prescription(prescriptionContract).addPermissioned(party);
+    }
+    
+    function removePrescriptionPermissions(address prescriptionContract) external onlyOwner {
+        Prescription(prescriptionContract).removePermissioned(prescriptionContract);
+    }
+
+    function isPermissioned() external view returns(bool) {
+        return permissioned[msg.sender];
+    }
+    
+    function getPrescriptionList() external view returns(address [] memory) {
+        return prescriptions;
     }
 }
+
