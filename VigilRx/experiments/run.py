@@ -40,15 +40,15 @@ def simulate_prescribing(role_pool):
     start = time.time()
     for i, patient in enumerate(role_pool['patients']):
         patient.add_permissioned(role_pool['prescribers'][i])
-        ndc = randint(1000000000, 9999999999)
-        quantity = randint(1, 250)
-        refills = randint(1, 250)
+        ndc = 1103716366 #randint(1000000000, 9999999999)
+        quantity = 3 #randint(1, 250)
+        refills = 14 #randint(1, 250)
         role_pool['prescribers'][i].new_prescription(patient, ndc, quantity, refills)
     return time.time() - start
 
 
 if __name__ == '__main__':
-    role_pool, runtime = deploy(2499, 2499)
+    role_pool, runtime = deploy(, )
     print(f'\n\nDeployed role contracts in {runtime}s\n')
 
     runtime = simulate_prescribing(role_pool)
