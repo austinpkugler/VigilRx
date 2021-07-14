@@ -1,4 +1,3 @@
-from VigilRx.experiments.compiled import REGISTRAR_ABI
 import json
 import os
 
@@ -27,14 +26,14 @@ class Registrar:
         patient_contract_address = str(self.contract.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
         return patient_contract_address
 
-    def new_prescriber(self, prescriber_personal_address):
-        tx_hash = self.contract.functions.createPrescriber(prescriber_personal_address).transact({'from': self.personal_address})
+    def new_prescriber(self, prescriber_personal_address, npi):
+        tx_hash = self.contract.functions.createPrescriber(prescriber_personal_address, npi).transact({'from': self.personal_address})
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         prescriber_contract_address = str(self.contract.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
         return prescriber_contract_address
 
-    def new_pharmacy(self, pharmacy_personal_address):
-        tx_hash = self.contract.functions.createPharmacy(pharmacy_personal_address).transact({'from': self.personal_address})
+    def new_pharmacy(self, pharmacy_personal_address, npi):
+        tx_hash = self.contract.functions.createPharmacy(pharmacy_personal_address, npi).transact({'from': self.personal_address})
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         pharmacy_contract_address = str(self.contract.events.NewAddress().processReceipt(tx_receipt)[0]['args']['contractAddress'])
         return pharmacy_contract_address
