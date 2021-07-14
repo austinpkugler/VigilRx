@@ -32,7 +32,7 @@ class Patient():
         self.gas_used += tx_receipt.gasUsed
 
     def __repr__(self):
-        return f'Patient(personal_address={self.personal_address}, contract_address={self.contract_address})'
+        return f'Patient(personal_address={self.personal_address}, contract_address={self.contract_address}, gas_used={self.gas_used})'
 
 
 class Prescriber():
@@ -45,7 +45,7 @@ class Prescriber():
         self.gas_used = 0
 
     def __repr__(self):
-        return f'Prescriber(personal_address={self.personal_address}, contract_address={self.contract_address})'
+        return f'Prescriber(personal_address={self.personal_address}, contract_address={self.contract_address}, gas_used={self.gas_used})'
 
     def new_prescription(self, patient, ndc, quantity, refills):
         tx_hash = self.contract.functions.createPrescription(patient.contract_address, ndc, quantity, refills).transact({'from': self.personal_address})
@@ -63,4 +63,4 @@ class Pharmacy():
         self.gas_used = 0
 
     def __repr__(self):
-        return f'Pharmacy(personal_address={self.personal_address}, contract_address={self.contract_address})'
+        return f'Pharmacy(personal_address={self.personal_address}, contract_address={self.contract_address}, gas_used={self.gas_used})'
