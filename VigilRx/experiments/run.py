@@ -44,62 +44,28 @@ def simulate_prescribing(role_pool):
         quantity = 3 #randint(1, 250)
         refills = 14 #randint(1, 250)
         role_pool['prescribers'][i].new_prescription(patient, ndc, quantity, refills)
+
     return time.time() - start
 
 
 if __name__ == '__main__':
-    role_pool, runtime = deploy(, )
-    print(f'\n\nDeployed role contracts in {runtime}s\n')
+    print(f'Deploying role contracts')
+    role_pool, runtime = deploy(3, 3)
+    print(f'Deployed role contracts in {runtime}s\n')
 
     runtime = simulate_prescribing(role_pool)
-    print(f'\n\nSimulated prescribing in {runtime}s\n')
+    print(f'Simulated prescribing in {runtime}s\n')
 
-'''
-*****Deployment Pseudocode*****
+    print('---- Prescribers ----')
+    for i, prescriber in enumerate(role_pool['prescribers']):
+        if i > 10:
+            print('...')
+            break
+        print(f'{i}\t{prescriber}')
 
-Deploy(patientCount = int, prescriberCount = int, pharmacyCount = int)
-	grc = Registrar()
-	patientList []
-	prescriberList []
-	pharmacyList []
-
-	for(int i = 0; i < patientCount; i++) {
-		temp = Patient()
-        temp.personalAddress = x;
-		temp.contractAddress = Registrar().createPatient(personalAddress);
-        temp.contract = PATIENT_ABI;
-
-        patientList.push(temp);
-	}
-
-    for(int i = 0; i < prescriberCount; i++) {
-		temp = Prescriber()
-        temp.npi = rand(9999999999);
-        temp.personalAddress = x;
-		temp.contractAddress = Registrar().createPrescriber(personalAddress, npi);
-        temp.contract = PRESCRIBER_ABI;
-
-        prescriberList.push(temp);
-	}
-
-    for(int i = 0; i < pharmacyCount; i++) {
-		temp = Pharmacy()
-        temp.npi = rand(9999999999);
-        temp.personalAddress = x;
-		temp.contractAddress = Registrar().createPharmacy(personalAddress, npi);
-        temp.contract = PHARMACY_ABI;
-
-        pharmacyList.push(temp);
-	}
-'''
-
-
-# from web3 import Web3
-
-
-# w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
-# address = w3.geth.personal.new_account('plswork')
-
-# for i, account in enumerate(w3.eth.accounts):
-#     balance = w3.eth.get_balance(account)
-#     print(f'{i}\t{account}\t{balance}')
+    print('\n\n---- Patients ----')
+    for i, patient in enumerate(role_pool['patients']):
+        if i > 10:
+            print('...')
+            break
+        print(f'{i}\t{patient}')
