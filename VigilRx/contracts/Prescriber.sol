@@ -11,7 +11,7 @@ import "./Registrar.sol";
 ///         contracts and tracking the ones created
 contract Prescriber {
     address owner;
-    Registrar public registrarContract;
+    Registrar public registrar;
 
     uint40 public npi;
     address[] patients;
@@ -19,20 +19,20 @@ contract Prescriber {
 
     event NewAddress(address indexed contractAddress);
 
-    constructor(address _prescriber, uint40 _npi) {
-        owner = _prescriber;
+    constructor(address _prescriberAddress, uint40 _npi) {
+        owner = _prescriberAddress;
         npi = _npi;
-        registrarContract = Registrar(msg.sender);
+        registrar = Registrar(msg.sender);
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Error: Message sender is not owner");
+        require(msg.sender == owner, "Presciber reverted: Requester is not owner");
         _;
     }
 
     function createPrescription(address patientContract, uint40 ndc, uint8 quantity, uint8 refills) external onlyOwner {
         Patient p = Patient(patientContract);
-        require(p.isPermissioned(), "Error: Patient has not permissioned you to issue prescriptions for them");
+        require(p.isPermissioned(), "Presciber reverted: Requester is not permissioned");
 
         // If the owner is currently not set as patient, then push them to the enumerated list 
         if (prescriptions[patientContract].length == 0) {
@@ -40,7 +40,7 @@ contract Prescriber {
         }
 
         // Create new prescription and add to mapping
-        address newPrescription = address(new Prescription(patientContract, address(registrarContract), ndc, quantity, refills));
+        address newPrescription = address(new Prescription(patientContract, address(registrar), ndc, quantity, refills));
         prescriptions[patientContract].push(newPrescription);
 
         // Add new prescription in the patient's contract as well

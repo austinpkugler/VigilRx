@@ -16,17 +16,19 @@ contract Prescription {
         uint8 refills;
     }
 
-    address public owner;
-    mapping(address => bool) permissioned;
-    Registrar public registrarContract;
-    PrescriptionInfo public p;
-
     bool public fillSigRequired;
+    bool public refillSigRequired;
+    
+    address public owner;
+    Registrar public registrar;
+    PrescriptionInfo public p;
+    
+    mapping(address => bool) permissioned;
 
     constructor(address _patientContract, address _registrarAddress, uint40 _ndc, uint8 _quantity, uint8 _refills) {
         owner = _patientContract;
         // Set global registry contract
-        registrarContract = Registrar(_registrarAddress);
+        registrar = Registrar(_registrarAddress);
 
         p.ndc = _ndc;
         p.quantity = _quantity;
@@ -35,38 +37,38 @@ contract Prescription {
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Requester is not owner.");
+        require(msg.sender == owner, "Prescription reverted: Requester is not owner");
         _;
     }
 
     modifier onlyPrescriber() {
-        require(msg.sender == p.prescriber, "Requester is not prescriber.");
+        require(msg.sender == p.prescriber, "Prescription reverted: Requester is not prescriber");
         _;
     }
 
     modifier onlyPermissioned {
-        require(msg.sender == p.prescriber || permissioned[msg.sender], "Requester is not permissioned.");
+        require(permissioned[msg.sender] || msg.sender == p.prescriber , "Prescription reverted: Requester is not permissioned");
         _;
     }
 
     /// @notice Add a new permissioned party to this prescription (i.e. Pharmacist)
     function addPermissionedPrescribered(address party) external onlyOwner {
-        require(permissioned[party] == false, "Error: Party already permissioned.");
-        require(registrarContract.isPharmacy(party) || registrarContract.isPrescriber(party), "Address is not registered");
+        require(permissioned[party] == false, "Prescription reverted: Requester is already permissioned");
+        require(registrar.isPharmacy(party), "Prescription reverted: Address is not registered");
 
         permissioned[party] = true;
     }
     
-        /// @notice Add a new permissioned part to this prescription (i.e. Pharmacist)
+        /// @notice Remove a permissioned party to this prescription (i.e. Pharmacist)
     function removePermissionedPrescribered(address party) external onlyOwner {
-        require(permissioned[party] == true, "Error: Party is not permissioned.");
+        require(permissioned[party] == true, "Prescription reverted: Requester is not permissioned");
 
         permissioned[party] = false;
     }
 
     /// Multi-Sig Phase 1
     function requestFill() external onlyOwner {
-        require(!fillSigRequired, "Error: Already signed, awaiting fill");
+        require(!fillSigRequired, "Prescription reverted: Prescription already signed");
 
         // Set check signature notifier
         fillSigRequired = true;
@@ -74,8 +76,7 @@ contract Prescription {
 
     /// Multi-Sig Phase 2 + Execution
     function fillPrescription(uint8 fillCount) external onlyPermissioned {
-        require(registrarContract.isPharmacy(msg.sender), "Error: Only pharmacy may validate fill request");
-        require(fillCount <= p.refills, "Error: Not enough refills available");
+        require(fillCount <= p.refills, "Prescription reverted: Not enough refills");
 
         p.refills -= fillCount;
 
@@ -86,10 +87,15 @@ contract Prescription {
     /// @notice Change the number of refills on this prescription
     function refillPrescription(uint8 refillCount) external onlyPrescriber {
         p.refills = refillCount;
+
+        // Reset the flag
+        refillSigRequired = false;
     }
 
     /// @notice Request refill (currently tabbed in)
-    // function requestRefill(uint8 refillCount) external view onlyPermissioned {
-    //     return;
-    // }
+    function requestRefill(uint8 refillCount) external onlyPermissioned {
+        require(!refillSigRequired, "Prescription reverted: Refill already signed");
+
+        refillSigRequired = true;
+    }
 }

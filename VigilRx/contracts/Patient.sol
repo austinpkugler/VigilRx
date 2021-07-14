@@ -11,71 +11,61 @@ import "./Prescription.sol";
 contract Patient {
     /// @notice Contract owner and registrar contract addresses
     address owner;
-    Registrar public registrarContract;
-
-    /// @notice Permissioned parties mapping, determines who is allowed certain actions
-    mapping(address => bool) public permissioned;
-
-    /// @notice List of current prescription contracts
-    address[] public prescriptions;
+    Registrar public registrar;
+    mapping(address => bool) public permissioned; /// @notice Permissioned parties mapping, determines who is allowed certain actions
+    address[] public prescriptions; /// @notice List of current prescription contracts
 
     /// @notice Set owner to the patient's address upon creation
     constructor(address _patient) {
         owner = _patient;
-        registrarContract = Registrar(msg.sender);
+        registrar = Registrar(msg.sender);
     }
 
     /// @notice Only the owner may perform the action
     modifier onlyOwner() {
-        require(msg.sender == owner, "Requester is not owner.");
+        require(msg.sender == owner, "Patient reverted: Requester is not owner");
         _;
     }
 
     /// @notice Only a permissioned party may perform the action
     modifier onlyPermissioned {
-        require(msg.sender == owner || permissioned[msg.sender] == true, "Requester is not permissioned.");
+        require(permissioned[msg.sender] == true || msg.sender == owner, "Patient reverted: Requester is not permissioned");
         _;
-    }
-
-    function addPrescription(address contractAddress) external onlyPermissioned {
-        require(registrarContract.isPrescriber(msg.sender), "Error: Requester is not registered as prescriber");
-        prescriptions.push(contractAddress);
-    }
-
-    function addPermissionedPrescriber(address party) external onlyOwner {
-        if (permissioned[party] == false) {
-            permissioned[party] = true;
-        } else {
-            revert();
-        }
-    }
-
-    function removePermissionedPrescriber(address party) external onlyOwner {
-        if (permissioned[party] == true) {
-            permissioned[party] = false;
-        } else {
-            revert();
-        }
-    }
-
-    function requestFill(address prescriptionContract) external onlyOwner {
-        Prescription(prescriptionContract).requestFill();
-    }
-
-    function addPrescriptionPermissions(address prescriptionContract, address party) external onlyOwner {
-        Prescription(prescriptionContract).addPermissionedPrescribered(party);
-    }
-    
-    function removePrescriptionPermissions(address prescriptionContract) external onlyOwner {
-        Prescription(prescriptionContract).removePermissionedPrescribered(prescriptionContract);
     }
 
     function isPermissioned() external view returns(bool) {
         return permissioned[msg.sender];
     }
-    
+
+    function addPrescription(address contractAddress) external onlyPermissioned {
+        require(registrar.isPrescriber(msg.sender), "Patient reverted: Requester is not prescriber");
+        prescriptions.push(contractAddress);
+    }
+
+    function addPermissionedPrescriber(address party) external onlyOwner {
+        require(permissioned[party] == false, "Patient reverted: Requester is already permissioned");
+        permissioned[party] = true;
+    }
+
+    function removePermissionedPrescriber(address party) external onlyOwner {
+        require(permissioned[party] == true, "Patient reverted: Requester is not permissioned");
+        permissioned[party] = false;
+    }
+
+    function addPrescriptionPermissions(address prescriptionContract, address party) external onlyOwner {
+        Prescription(prescriptionContract).addPermissionedPrescribered(party);
+    }
+
+    function removePrescriptionPermissions(address prescriptionContract) external onlyOwner {
+        Prescription(prescriptionContract).removePermissionedPrescribered(prescriptionContract);
+    }
+
     function getPrescriptionList() external view returns(address [] memory) {
         return prescriptions;
+    }
+
+    function requestFill(address prescriptionContract) external onlyOwner {
+        Prescription(prescriptionContract).requestFill();
     }
 }
 

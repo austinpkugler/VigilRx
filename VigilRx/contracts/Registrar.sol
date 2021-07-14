@@ -14,7 +14,6 @@ contract Registrar {
 
     // 1 == Patient, 2 == Prescriber, 3 == Pharmacy
     mapping(address => uint8) contractStatus;
-
     event NewAddress(address indexed contractAddress);
 
     constructor() {
@@ -23,7 +22,7 @@ contract Registrar {
 
     /// @notice Require that the sender of the transactions be the contract owner
     modifier onlyOwner() {
-        require(msg.sender == owner, "Requester is not owner: reverted");
+        require(msg.sender == owner, "Registrar reverted: Requester is not owner");
         _;
     }
 
