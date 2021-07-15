@@ -11,7 +11,7 @@ def deploy_role_pool(pool_size):
     role_pool = {'patients': [], 'prescribers': [], 'pharmacies': []}
     current_account = 1
 
-    for i in range(pool_size):
+    for i in range(pool_size // 3):
         patient = Patient(w3.eth.accounts[current_account])
         role_pool['patients'].append(patient)
         current_account += 1
@@ -89,13 +89,18 @@ def calculate_gas_used(role_pool):
     patient_gas_used = sum(p.gas_used for p in role_pool['patients'])
     prescriber_gas_used = sum(p.gas_used for p in role_pool['prescribers'])
     pharmacy_gas_used = sum(p.gas_used for p in role_pool['pharmacies'])
-    return sum(patient_gas_used, prescriber_gas_used, pharmacy_gas_used)
+    return patient_gas_used + prescriber_gas_used + pharmacy_gas_used
 
 
 def cycle(pool_size, num_cycles=1):
+    runtime = []
+    gas_used = []
     role_pool = deploy_role_pool(pool_size)
 
+    print ("Deployment phase complete.")
+
     for i in range(num_cycles):
+        start = time.time()
         for patient in role_pool['patients']:
             simulate_patient(role_pool, patient)
         for pharmacy in role_pool['pharmacies']:
@@ -103,6 +108,17 @@ def cycle(pool_size, num_cycles=1):
         for prescriber in role_pool['prescribers']:
             simulate_prescriber(prescriber)
 
+        runtime.append(time.time() - start)
+        gas_used.append(calculate_gas_used(role_pool))
+
+    return runtime, gas_used
+
+
 
 if __name__ == '__main__':
-    cycle(5)
+    CYCLES = 5
+    runtime, gas_used = cycle(99, CYCLES)
+
+    print(f'cycle\truntime\tgas used')
+    for i in range(CYCLES):
+        print(f'{i + 1}\t{runtime[i]}\t{gas_used[i]}')
