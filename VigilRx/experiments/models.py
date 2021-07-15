@@ -58,8 +58,8 @@ class Roles():
 
 class Provider(Roles):
 
-    def __init__(self, npi, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, personal_address, npi):
+        super().__init__(personal_address)
         self.npi = npi
 
     def get_patients(self):
@@ -76,8 +76,8 @@ class Provider(Roles):
 
 class Patient(Roles):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, personal_address):
+        super().__init__(personal_address)
         self.contract_address = self.registrar.new_patient(self.personal_address)
         self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PATIENT_ABI)
 
@@ -125,8 +125,8 @@ class Patient(Roles):
 
 class Prescriber(Provider):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, personal_address, npi):
+        super().__init__(personal_address, npi)
         self.contract_address = self.registrar.new_prescriber(self.personal_address, self.npi)
         self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PRESCRIBER_ABI)
 
@@ -160,8 +160,8 @@ class Prescriber(Provider):
 
 class Pharmacy(Provider):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, personal_address, npi):
+        super().__init__(personal_address, npi)
         self.contract_address = self.registrar.new_pharmacy(self.personal_address, self.npi)
         self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PHARMACY_ABI)
 
