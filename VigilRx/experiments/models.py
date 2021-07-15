@@ -190,11 +190,3 @@ class Pharmacy(Provider):
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         self.gas_used += tx_receipt.gasUsed
-
-
-# patient = Patient(w3.eth.accounts[1])
-# print(patient)
-# prescriber = Prescriber(w3.eth.accounts[2], 288)
-# patient.add_permissioned(prescriber)
-# print(prescriber)
-# prescriber.new_prescription(patient, 2, 2, 2)
