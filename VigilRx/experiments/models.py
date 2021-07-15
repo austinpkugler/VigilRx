@@ -23,8 +23,8 @@ class Registrar():
     def new_patient(self, personal_address):
         tx_hash = self.contract.functions.createPatient(personal_address).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        tx_receipt = self.contract.events.NewAddress().processReceipt(tx_receipt)
-        return str(tx_receipt[0]['args']['contractAddress'])
+        tx_event = self.contract.events.NewAddress().processReceipt(tx_receipt)
+        return str(tx_event[0]['args']['contractAddress'])
 
     def new_prescriber(self, personal_address, npi):
         tx_hash = self.contract.functions.createPrescriber(
@@ -32,8 +32,8 @@ class Registrar():
             npi
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        tx_receipt = self.contract.events.NewAddress().processReceipt(tx_receipt)
-        return str(tx_receipt[0]['args']['contractAddress'])
+        tx_event = self.contract.events.NewAddress().processReceipt(tx_receipt)
+        return str(tx_event[0]['args']['contractAddress'])
 
     def new_pharmacy(self, personal_address, npi):
         tx_hash = self.contract.functions.createPharmacy(
@@ -41,8 +41,8 @@ class Registrar():
             npi
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        tx_receipt = self.contract.events.NewAddress().processReceipt(tx_receipt)
-        return str(tx_receipt[0]['args']['contractAddress'])
+        tx_event = self.contract.events.NewAddress().processReceipt(tx_receipt)
+        return str(tx_event[0]['args']['contractAddress'])
 
 
 class Roles():
@@ -141,9 +141,9 @@ class Prescriber(Provider):
             refills
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        tx_receipt = self.contract.events.NewAddress().processReceipt(tx_receipt)
+        tx_event = self.contract.events.NewAddress().processReceipt(tx_receipt)
         self.gas_used += tx_receipt.gasUsed
-        return str(tx_receipt[0]['args']['contractAddress'])
+        return str(tx_event[0]['args']['contractAddress'])
 
     def refill_prescription(self, prescription_address, refill_count):
         tx_hash = self.contract.functions.refillPrescription(
