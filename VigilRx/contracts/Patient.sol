@@ -53,11 +53,11 @@ contract Patient {
     }
 
     function addPrescriptionPermissions(address prescriptionContract, address party) external onlyOwner {
-        Prescription(prescriptionContract).addPermissionedPrescribered(party);
+        Prescription(prescriptionContract).addPermissionedPrescriber(party);
     }
 
-    function removePrescriptionPermissions(address prescriptionContract) external onlyOwner {
-        Prescription(prescriptionContract).removePermissionedPrescribered(prescriptionContract);
+    function removePrescriptionPermissions(address prescriptionContract, address party) external onlyOwner {
+        Prescription(prescriptionContract).removePermissionedPrescriber(party);
     }
 
     function getPrescriptionList() external view returns(address [] memory) {

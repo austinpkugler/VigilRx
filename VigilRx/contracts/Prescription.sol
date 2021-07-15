@@ -52,7 +52,7 @@ contract Prescription {
     }
 
     /// @notice Add a new permissioned party to this prescription (i.e. Pharmacist)
-    function addPermissionedPrescribered(address party) external onlyOwner {
+    function addPermissionedPrescriber(address party) external onlyOwner {
         require(permissioned[party] == false, "Prescription reverted: Requester is already permissioned");
         require(registrar.isPharmacy(party), "Prescription reverted: Address is not registered");
 
@@ -60,7 +60,7 @@ contract Prescription {
     }
     
         /// @notice Remove a permissioned party to this prescription (i.e. Pharmacist)
-    function removePermissionedPrescribered(address party) external onlyOwner {
+    function removePermissionedPrescriber(address party) external onlyOwner {
         require(permissioned[party] == true, "Prescription reverted: Requester is not permissioned");
 
         permissioned[party] = false;
@@ -93,7 +93,7 @@ contract Prescription {
     }
 
     /// @notice Request refill (currently tabbed in)
-    function requestRefill(uint8 refillCount) external onlyPermissioned {
+    function requestRefill() external onlyPermissioned {
         require(!refillSigRequired, "Prescription reverted: Refill already signed");
 
         refillSigRequired = true;

@@ -14,7 +14,7 @@ contract Prescriber {
     Registrar public registrar;
 
     uint40 public npi;
-    address[] patients;
+    address[] public patients;
     mapping(address => address[]) public prescriptions;
 
     event NewAddress(address indexed contractAddress);
@@ -51,5 +51,13 @@ contract Prescriber {
 
     function refillPrescription(address prescriptionContract, uint8 refillCount) external onlyOwner {
         Prescription(prescriptionContract).refillPrescription(refillCount);
+    }
+
+    function getPatientList() external view returns(address [] memory) {
+        return patients;
+    }
+
+    function getPrescriptionList(address patientAddress) external view returns(address [] memory) {
+        return prescriptions[patientAddress];
     }
 }

@@ -14,8 +14,8 @@ contract Pharmacy {
 
     uint40 public npi;
 
-    address[] patients;
-    mapping(address => address[]) prescriptions;
+    address[] public patients;
+    mapping(address => address[]) public prescriptions;
 
     constructor(address _pharmacy, uint40 _npi) {
         owner = _pharmacy;
@@ -44,7 +44,15 @@ contract Pharmacy {
         Prescription(contractAddress).fillPrescription(fillCount);
     }
 
-    function requestRefill(address contractAddress, uint8 refillCount) external onlyOwner {
-        Prescription(contractAddress).requestRefill(refillCount);
+    function requestRefill(address contractAddress) external onlyOwner {
+        Prescription(contractAddress).requestRefill();
+    }
+
+    function getPatientList() external view returns(address [] memory) {
+        return patients;
+    }
+    
+    function getPrescriptionList(address patientAddress) external view returns(address [] memory) {
+        return prescriptions[patientAddress];
     }
 }
