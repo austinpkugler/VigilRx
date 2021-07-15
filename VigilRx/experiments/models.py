@@ -176,7 +176,7 @@ class Pharmacy(Provider):
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         self.gas_used += tx_receipt.gasUsed
 
-    def fill(self, prescription_address, fill_count):
+    def fill_prescription(self, prescription_address, fill_count):
         tx_hash = self.contract.functions.fillPrescription(
             prescription_address,
             fill_count
