@@ -47,8 +47,9 @@ class Registrar():
 
 class Roles():
 
+    registrar = Registrar()
+
     def __init__(self, personal_address):
-        self.registrar = Registrar()
         self.personal_address = personal_address
         self.sender = {'from': self.personal_address}
         self.contract_address = None
@@ -78,7 +79,7 @@ class Patient(Roles):
 
     def __init__(self, personal_address):
         super().__init__(personal_address)
-        self.contract_address = self.registrar.new_patient(self.personal_address)
+        self.contract_address = Roles.registrar.new_patient(self.personal_address)
         self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PATIENT_ABI)
 
     def __repr__(self):
@@ -127,7 +128,7 @@ class Prescriber(Provider):
 
     def __init__(self, personal_address, npi):
         super().__init__(personal_address, npi)
-        self.contract_address = self.registrar.new_prescriber(self.personal_address, self.npi)
+        self.contract_address = Roles.registrar.new_prescriber(self.personal_address, self.npi)
         self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PRESCRIBER_ABI)
 
     def __repr__(self):
@@ -162,7 +163,7 @@ class Pharmacy(Provider):
 
     def __init__(self, personal_address, npi):
         super().__init__(personal_address, npi)
-        self.contract_address = self.registrar.new_pharmacy(self.personal_address, self.npi)
+        self.contract_address = Roles.registrar.new_pharmacy(self.personal_address, self.npi)
         self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PHARMACY_ABI)
 
     def __repr__(self):
@@ -189,3 +190,11 @@ class Pharmacy(Provider):
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         self.gas_used += tx_receipt.gasUsed
+
+
+# patient = Patient(w3.eth.accounts[1])
+# print(patient)
+# prescriber = Prescriber(w3.eth.accounts[2], 288)
+# patient.add_permissioned(prescriber)
+# print(prescriber)
+# prescriber.new_prescription(patient, 2, 2, 2)
