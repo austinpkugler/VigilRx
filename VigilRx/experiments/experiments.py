@@ -85,6 +85,13 @@ def simulate_pharmacy(pharmacy):
             pharmacy.request_refill(prescription_address)
 
 
+def calculate_gas_used(role_pool):
+    patient_gas_used = sum(p.gas_used for p in role_pool['patients'])
+    prescriber_gas_used = sum(p.gas_used for p in role_pool['prescribers'])
+    pharmacy_gas_used = sum(p.gas_used for p in role_pool['pharmacies'])
+    return sum(patient_gas_used, prescriber_gas_used, pharmacy_gas_used)
+
+
 def cycle(pool_size, num_cycles=1):
     role_pool = deploy_role_pool(pool_size)
 
