@@ -3,32 +3,38 @@ import os
 
 from web3 import Web3
 
-import errors
+
+class NotCompiledException(Exception):
+    """Raised when Solidity contracts are not compiled. A build must be
+    compiled to prevent this exception.
+    """
+    pass
+
+
+class GanacheConnectionException(Exception):
+    """Raised when Web3 cannot connect to Ganache, usually due to
+    Ganache not being run previous to attempted connection.
+    """
+    pass
 
 
 try:
     with open(os.path.join('build', 'Registrar.abi'), 'r') as file:
-        _REGISTRAR_ABI = json.load(file)
+        REGISTRAR_ABI = json.load(file)
     with open(os.path.join('build', 'Registrar.bin'), 'r') as file:
-        _REGISTRAR_BIN = file.read()
+        REGISTRAR_BIN = file.read()
+    with open(os.path.join('build', 'Patient.abi'), 'r') as file:
+        PATIENT_ABI = json.load(file)
+    with open(os.path.join('build', 'Prescriber.abi'), 'r') as file:
+        PRESCRIBER_ABI = json.load(file)
+    with open(os.path.join('build', 'Pharmacy.abi'), 'r') as file:
+        PHARMACY_ABI = json.load(file)
+    with open(os.path.join('build', 'Prescription.abi'), 'r') as file:
+        PRESCRIPTION_ABI = json.load(file)
 except Exception as e:
-    [raise errors.NotCompiledException()]
+    raise NotCompiledException()
 
 try:
     w3 = Web3(Web3.HTTPProvider('http://localhost:8545'))
-    w3.eth.default_account = w3.eth.accounts[0]
 except:
-    raise errors.GanacheException()
-
-
-def new_registrar():
-    contract = w3.eth.contract(abi=_REGISTRAR_ABI, bytecode=_REGISTRAR_BIN)
-    tx_hash = contract.constructor().transact()
-    tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    registrar_contract = w3.eth.contract(address=tx_receipt.contractAddress, abi=_REGISTRAR_ABI)
-    with open(os.path.join('build', 'bridge.json'), 'w') as file:
-        json.dump({'grc_address': registrar_contract.address}, file, indent=4)
-
-
-if __name__ == '__main__':
-    new_registrar()
+    raise GanacheConnectionException()
