@@ -47,7 +47,7 @@ def simulate_patient(role_pool, patient):
         contracts deployed to Ganache.
     :type rool_pool: dict
     :param patient: Patient object to simulate actions for.
-    :type patient: Patient
+    :type patient: :class:`Patient`
     """
     # If the patient does not have a prescriber
     if not patient.get_prescriptions():
@@ -92,7 +92,7 @@ def simulate_prescriber(prescriber):
     prescription refills.
 
     :param prescriber: Prescriber object to simulate actions for.
-    :type prescriber: Prescriber
+    :type prescriber: :class:`Prescriber`
     """
     # Prescriber checks for refill flags and completes multisig refills.
     for prescription_address in prescriber.get_prescriptions():
@@ -113,7 +113,7 @@ def simulate_pharmacy(pharmacy):
     prescription fills.
 
     :param pharmacy: Pharmacy object to simulate actions for.
-    :type pharmacy: Pharmacy
+    :type pharmacy: :class:`Pharmacy`
     """
     # Pharmacy checks for fill flags and completes multisig fills.
     for prescription_address in pharmacy.get_prescriptions():

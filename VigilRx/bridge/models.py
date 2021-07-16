@@ -52,7 +52,7 @@ class Registrar():
         :param personal_address: A valid Ganache account address used to
             deploy a new prescriber role contract.
         :type personal_address: str
-        :param npi: National Provider Identifier of prescriber being
+        :param npi: National provider identifier of prescriber being
             created.
         :type npi: int
         :returns: Prescriber object representing newly deployed
@@ -73,7 +73,7 @@ class Registrar():
         :param personal_address: A valid Ganache account address used to
             deploy a new pharmacy role contract.
         :type personal_address: str
-        :param npi: National Provider Identifier of pharmacy being
+        :param npi: National provider identifier of pharmacy being
             created.
         :type npi: int
         :returns: Pharmacy object representing newly deployed pharmacy
@@ -115,7 +115,7 @@ class Provider(Roles):
     :param personal_address: A valid Ganache account address used to
         deploy a new role contract.
     :type personal_address: str
-    :param npi: National Provider Identifier of provider.
+    :param npi: National provider identifier of provider.
     :type npi: int
     """
 
@@ -124,14 +124,26 @@ class Provider(Roles):
         self.npi = npi
 
     def get_patients(self):
-        patient_list = self.contract.functions.getPatientList().call()
-        return patient_list
+        """Returns a list of all patient role contract addresses
+        associated with the :class:`Provider` instance.
+
+        :returns: List of patient role contract addresses.
+        :rtype: list
+        """
+        return self.contract.functions.getPatientList().call()
 
     def get_prescriptions(self):
+        """Returns a list of all prescription contract addresses
+        associated with the :class:`Provider` instance.
+
+        :returns: List of prescription contract addresses.
+        :rtype: list
+        """
         prescriptions = []
         for i in self.get_patients():
             prescriptions += self.contract.functions.getPrescriptionList(
-                i).call()
+                i
+            ).call()
 
         return prescriptions
 
@@ -160,6 +172,13 @@ class Patient(Roles):
         return f'Patient(contract_address={self.contract_address})'
 
     def add_permissioned(self, prescriber):
+        """Adds a prescriber as permissioned to prescribe to the
+        :class:`Patient` instance.
+
+        :param prescriber: An instance of :class:`Prescriber` to add
+            as a permissioned prescriber.
+        :type personal_address: :class:`Prescriber`
+        """
         tx_hash = self.contract.functions.addPermissionedPrescriber(
             prescriber.contract_address
         ).transact(self.sender)
@@ -167,6 +186,13 @@ class Patient(Roles):
         self.gas_used += tx_receipt.gasUsed
 
     def remove_permissioned(self, prescriber):
+        """Removes a prescriber as permissioned to prescribe to the
+        :class:`Patient` instance.
+
+        :param prescriber: Instance of :class:`Prescriber` to remove
+            as a permissioned prescriber.
+        :type personal_address: :class:`Prescriber`
+        """
         tx_hash = self.contract.functions.removePermissionedPrescriber(
             prescriber.contract_address
         ).transact(self.sender)
@@ -174,6 +200,16 @@ class Patient(Roles):
         self.gas_used += tx_receipt.gasUsed
 
     def add_prescription_permissions(self, prescription_address, pharmacy):
+        """Adds a pharmacy as permissioned to view and fill the
+        prescriptions for the :class:`Patient` instance.
+
+        :param prescription_address: Address of prescription to add
+            permissions to.
+        :param prescription_address: str
+        :param pharmacy: Instance of :class:`Pharmacy` to add as
+            permissioned on the prescription.
+        :type personal_address: :class:`Pharmacy`
+        """
         tx_hash = self.contract.functions.addPrescriptionPermissions(
             prescription_address,
             pharmacy.contract_address
@@ -182,6 +218,16 @@ class Patient(Roles):
         self.gas_used += tx_receipt.gasUsed
 
     def remove_prescription_permissions(self, prescription_address, pharmacy):
+        """Removes a pharmacy as permissioned to view and fill the
+        prescriptions for the :class:`Patient` instance.
+
+        :param prescription_address: Address of prescription to remove
+            permissions from.
+        :param prescription_address: str
+        :param pharmacy: Instance of :class:`Pharmacy` to remove as
+            permissioned on the prescription.
+        :type personal_address: :class:`Pharmacy`
+        """
         tx_hash = self.contract.functions.removePrescriptionPermissions(
             prescription_address,
             pharmacy.contract_address
@@ -190,6 +236,13 @@ class Patient(Roles):
         self.gas_used += tx_receipt.gasUsed
 
     def request_fill(self, prescription_address):
+        """Sets a request fill flag to true for the specified
+        prescription, part of multisig prescription filling.
+
+        :param prescription_address: Address of prescription to request
+            a fill for.
+        :param prescription_address: str
+        """
         tx_hash = self.contract.functions.requestFill(
             prescription_address
         ).transact(self.sender)
@@ -197,6 +250,12 @@ class Patient(Roles):
         self.gas_used += tx_receipt.gasUsed
 
     def get_prescriptions(self):
+        """Returns a list of all prescription contract addresses
+        associated with the :class:`Patient` instance.
+
+        :returns: List of prescription contract addresses.
+        :rtype: list
+        """
         return self.contract.functions.getPrescriptionList().call()
 
 
@@ -208,7 +267,7 @@ class Prescriber(Provider):
     :param personal_address: A valid Ganache account address used to
         deploy a new prescriber role contract.
     :type personal_address: str
-    :param npi: National Provider Identifier of prescriber.
+    :param npi: National provider identifier of prescriber.
     :type npi: int
     """
 
@@ -227,6 +286,20 @@ class Prescriber(Provider):
         return f'Prescriber(contract_address={self.contract_address})'
 
     def new_prescription(self, patient, ndc, quantity, refills):
+        """Deploys new prescription contract to Ganache.
+
+        :param patient: Instance of :class:`Patient` to use as the
+            prescription contract owner.
+        :type patient: :class:`Patient`
+        :param ndc: National drug code of prescription.
+        :type ndc: int
+        :param quantity: Number of drugs per each prescription fill.
+        :type quantity: int
+        :param refills: Number of prescription refills.
+        :type refills: int
+        :returns: Contract address of the newly deployed prescription.
+        :rtype: str
+        """
         tx_hash = self.contract.functions.createPrescription(
             patient.contract_address,
             ndc,
@@ -239,6 +312,14 @@ class Prescriber(Provider):
         return str(tx_event[0]['args']['contractAddress'])
 
     def refill_prescription(self, prescription_address, refill_count):
+        """Updates the refill number for a specified prescription.
+
+        :param prescription_address: Contract address of a deployed
+            prescription.
+        :type prescription_address: str
+        :param refill_count: Updated number of prescription refills.
+        :type refill_count: int
+        """
         tx_hash = self.contract.functions.refillPrescription(
             prescription_address,
             refill_count
@@ -248,6 +329,12 @@ class Prescriber(Provider):
         self.gas_used += tx_receipt.gasUsed
 
     def cancel_prescription(self, prescription_address):
+        """Updates the refill number to 0 for a specified prescription.
+
+        :param prescription_address: Contract address of a deployed
+            prescription.
+        :type prescription_address: str
+        """
         self.refill_prescription(prescription_address, 0)
 
 
@@ -259,7 +346,7 @@ class Pharmacy(Provider):
     :param personal_address: A valid Ganache account address used to
         deploy a new pharmacy role contract.
     :type personal_address: str
-    :param npi: National Provider Identifier of pharmacy.
+    :param npi: National provider identifier of pharmacy.
     :type npi: int
     """
 
@@ -278,6 +365,13 @@ class Pharmacy(Provider):
         return f'Pharmacy(contract_address={self.contract_address})'
 
     def add_prescription(self, prescription_address):
+        """Adds the specified prescription to the :class:`Pharmacy`'s
+        list of prescriptions.
+
+        :param prescription_address: Contract address of a deployed
+            prescription.
+        :type prescription_address: str
+        """
         tx_hash = self.contract.functions.addPrescription(
             prescription_address
         ).transact(self.sender)
@@ -285,6 +379,15 @@ class Pharmacy(Provider):
         self.gas_used += tx_receipt.gasUsed
 
     def fill_prescription(self, prescription_address, fill_count):
+        """Fills the specified prescription.
+
+        :param prescription_address: Contract address of a deployed
+            prescription.
+        :type prescription_address: str
+        :param fill_count: Number to decrement from the deployed
+            prescription contract's refills.
+        :type fill_count: int
+        """
         tx_hash = self.contract.functions.fillPrescription(
             prescription_address,
             fill_count
@@ -293,6 +396,13 @@ class Pharmacy(Provider):
         self.gas_used += tx_receipt.gasUsed
 
     def request_refill(self, prescription_address):
+        """Sets the request refill flag to true for the specified
+        prescription.
+
+        :param prescription_address: Contract address of a deployed
+            prescription.
+        :type prescription_address: str
+        """
         tx_hash = self.contract.functions.requestRefill(
             prescription_address
         ).transact(self.sender)
