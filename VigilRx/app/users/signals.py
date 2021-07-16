@@ -10,21 +10,19 @@ curr_dir = os.path.dirname(__file__)
 bridge_dir = os.path.abspath(os.path.join(curr_dir, os.path.join('..', '..', 'bridge')))
 sys.path.append(bridge_dir)
 
-from registrar import new_patient, new_prescriber, new_pharmacy
-
 
 @receiver(post_save, sender=CustomUser)
 def create_contract(sender, instance, created, **kwargs):
     if not instance.contract:
         # Patient
         if instance.role == 1:
-            patient_contract = new_patient(instance)
+            patient_contract = ''
             CustomUser.objects.filter(username=instance.username).update(contract=patient_contract)
         # Prescriber
         elif instance.role == 2:
-            prescriber_contract = new_prescriber(instance)
+            prescriber_contract = ''
             CustomUser.objects.filter(username=instance.username).update(contract=prescriber_contract)
         # Pharmacy
         elif instance.role == 3:
-            pharmacy_contract = new_pharmacy(instance)
+            pharmacy_contract = ''
             CustomUser.objects.filter(username=instance.username).update(contract=pharmacy_contract)
