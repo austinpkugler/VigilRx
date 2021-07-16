@@ -3,6 +3,8 @@ import os
 import random
 import time
 
+import pandas as pd
+
 from bridge import w3, PRESCRIPTION_ABI
 from models import Patient, Prescriber, Pharmacy
 
@@ -37,16 +39,18 @@ class Simulator():
             current_account += 1
 
         for i in range(int(self.pool_size * self.prescriber_ratio)):
-            npi = random.randint(1000000000, 9999999999)
+            npi = 5555555555
             prescriber = Prescriber(w3.eth.accounts[current_account], npi)
             self.role_pool['prescribers'].append(prescriber)
             current_account += 1
 
         for i in range(int(self.pool_size * self.pharmacy_ratio)):
-            npi = random.randint(1000000000, 9999999999)
+            npi = 5555555555
             pharmacy = Pharmacy(w3.eth.accounts[current_account], npi)
             self.role_pool['pharmacies'].append(pharmacy)
             current_account += 1
+        
+        print("===== Role pool deployment complete =====")
 
     def simulate_patient(self, patient):
         """Simulates the actions of a patient, like adding permissions and
@@ -66,9 +70,9 @@ class Simulator():
             patient.add_permissioned(prescriber)
 
             # Prescriber issues patient a new prescription
-            ndc = random.randint(1000000000, 9999999999)
+            ndc = 5555555555
             quantity = random.randint(1, 9)
-            refills = random.randint(10, 99)
+            refills = random.randint(1, 9)
             prescription_address = prescriber.new_prescription(
                 patient,
                 ndc,
@@ -116,7 +120,7 @@ class Simulator():
             if prescription_contract.functions.refillSigRequired().call():
                 prescriber.refill_prescription(
                     prescription_address,
-                    random.randint(10, 99)
+                    random.randint(1, 9)
                 )
 
     def simulate_pharmacy(self, pharmacy):
@@ -134,11 +138,10 @@ class Simulator():
             )
 
             fill_sig = prescription_contract.functions.fillSigRequired().call()
-            fillCount = prescription_contract.functions.p().call()[2]
-
-            if fill_sig and fillCount:
+            fill_count = prescription_contract.functions.p().call()[3]
+            if fill_sig and fill_count:
                 pharmacy.fill_prescription(prescription_address, 1)
-            elif fill_sig and not fillCount:
+            elif fill_sig and not fill_count:
                 pharmacy.request_refill(prescription_address)
 
     def cycle(self):
@@ -157,32 +160,38 @@ class Simulator():
             for pharmacy in self.role_pool['pharmacies']:
                 self.simulate_pharmacy(pharmacy)
 
+            print("===== Cycle ", i + 1, "/", self.num_cycles, " Complete =====")
+
+        print("✧･ﾟ: *✧･ﾟ:* Simulation Complete *:･ﾟ✧*:･ﾟ✧")
+
     def save_role_pool(self):
-        role_pool_json = {'totals': {}, 'patients': [], 'prescribers': [], 'pharmacies': []}
-        totals = {
+        role_dicts = []
+        for role, role_objects in self.role_pool.items():
+            for role_object in role_objects:
+                role_dict = role_object.to_dict()
+                for function, value in role_dict['runtime'].items():
+                    role_dict[function + '_runtime'] = value
+                for function, value in role_dict['gas_used'].items():
+                    role_dict[function + '_gas_used'] = value
+                for function, value in role_dict['transactions'].items():
+                    role_dict[function + '_transactions'] = value
 
-        }
+                role_dict.pop('runtime')
+                role_dict.pop('gas_used')
+                role_dict.pop('transactions')
 
-        for patient in self.role_pool['patients']:
-            patient_dict = patient.to_dict()
-            role_pool_json['patients'].append(patient_dict)
-
-        for prescriber in self.role_pool['prescribers']:
-            prescriber_dict = prescriber.to_dict()
-            role_pool_json['prescribers'].append(prescriber_dict)
-
-        for pharmacy in self.role_pool['pharmacies']:
-            pharmacy_dict = pharmacy.to_dict()
-            role_pool_json['pharmacies'].append(pharmacy_dict)
+                role_dicts.append(role_dict)
 
         if not os.path.exists('experiments'):
             os.mkdir(os.path.join('experiments'))
 
-        with open(os.path.join('experiments', f'role_pool_{int(time.time())}.json'), 'w') as file:
-            json.dump(role_pool_json, file, indent=4)
+        save_time = int(time.time())
+
+        df = pd.DataFrame(role_dicts)
+        df.to_csv(os.path.join('experiments', f'role_pool_{save_time}.csv'))
 
 
 if __name__ == '__main__':
-    simulator = Simulator(50, 2, 0.8, 0.16, 0.04)
+    simulator = Simulator(50, 10, 0.8, 0.16, 0.04)
     simulator.cycle()
     simulator.save_role_pool()

@@ -390,8 +390,6 @@ class Prescriber(Provider):
 
         self.runtime['refill_prescription'] += time.time() - start
 
-        prescription_address.refills = refill_count
-
         self.gas_used['refill_prescription'] += tx_receipt.gasUsed
         self.transactions['refill_prescription'] += 1
 
