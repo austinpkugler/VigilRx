@@ -260,9 +260,9 @@ class Patient(Roles):
 
 
 class Prescriber(Provider):
-    """Represents Solidity prescriber role contract and allows prescriber
-    prescription actions to be performed via Web3. Inherits from
-    :class:`Provider`.
+    """Represents Solidity prescriber role contract and allows
+    prescriber prescription actions to be performed via Web3. Inherits
+    from :class:`Provider`.
 
     :param personal_address: A valid Ganache account address used to
         deploy a new prescriber role contract.
