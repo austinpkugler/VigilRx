@@ -136,3 +136,6 @@ package-lock.json
 # Solidity
 *.abi
 *.bin
+
+# VigilRx
+experiments/
