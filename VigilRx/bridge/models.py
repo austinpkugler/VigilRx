@@ -1,5 +1,4 @@
-import json
-import os
+import time
 
 from web3 import Web3
 
@@ -105,7 +104,6 @@ class Roles():
         self.sender = {'from': self.personal_address}
         self.contract_address = None
         self.contract = None
-        self.gas_used = 0
 
 
 class Provider(Roles):
@@ -141,9 +139,7 @@ class Provider(Roles):
         """
         prescriptions = []
         for i in self.get_patients():
-            prescriptions += self.contract.functions.getPrescriptionList(
-                i
-            ).call()
+            prescriptions += self.contract.functions.getPrescriptionList(i).call()
 
         return prescriptions
 
@@ -160,16 +156,42 @@ class Patient(Roles):
 
     def __init__(self, personal_address):
         super().__init__(personal_address)
-        self.contract_address = Roles._registrar.new_patient(
-            self.personal_address
-        )
-        self.contract = w3.eth.contract(
-            address=self.contract_address,
-            abi=bridge.PATIENT_ABI
-        )
+        self.contract_address = Roles._registrar.new_patient(self.personal_address)
+        self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PATIENT_ABI)
+        self.runtime = {
+            'add_permissioned': 0,
+            'remove_permissioned': 0,
+            'add_prescription_permissions': 0,
+            'remove_prescription_permissions': 0,
+            'request_fill': 0
+        }
+        self.gas_used = {
+            'add_permissioned': 0,
+            'remove_permissioned': 0,
+            'add_prescription_permissions': 0,
+            'remove_prescription_permissions': 0,
+            'request_fill': 0
+        }
+        self.transactions = {
+            'add_permissioned': 0,
+            'remove_permissioned': 0,
+            'add_prescription_permissions': 0,
+            'remove_prescription_permissions': 0,
+            'request_fill': 0
+        }
 
     def __repr__(self):
         return f'Patient(contract_address={self.contract_address})'
+
+    def to_dict(self):
+        return {
+            'role': 'patient',
+            'personal_address': self.personal_address,
+            'contract_address': self.contract_address,
+            'runtime': self.runtime,
+            'gas_used': self.gas_used,
+            'transactions': self.transactions
+        }
 
     def add_permissioned(self, prescriber):
         """Adds a prescriber as permissioned to prescribe to the
@@ -179,11 +201,16 @@ class Patient(Roles):
             as a permissioned prescriber.
         :type personal_address: :class:`Prescriber`
         """
+        start = time.time()
+
         tx_hash = self.contract.functions.addPermissionedPrescriber(
             prescriber.contract_address
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.runtime['add_permissioned'] += time.time() - start
+        self.gas_used['add_permissioned'] += tx_receipt.gasUsed
+        self.transactions['add_permissioned'] += 1
 
     def remove_permissioned(self, prescriber):
         """Removes a prescriber as permissioned to prescribe to the
@@ -193,11 +220,16 @@ class Patient(Roles):
             as a permissioned prescriber.
         :type personal_address: :class:`Prescriber`
         """
+        start = time.time()
+
         tx_hash = self.contract.functions.removePermissionedPrescriber(
             prescriber.contract_address
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.runtime['remove_permissioned'] += time.time() - start
+        self.gas_used['remove_permissioned'] += tx_receipt.gasUsed
+        self.transactions['remove_permissioned'] += 1
 
     def add_prescription_permissions(self, prescription_address, pharmacy):
         """Adds a pharmacy as permissioned to view and fill the
@@ -210,12 +242,17 @@ class Patient(Roles):
             permissioned on the prescription.
         :type personal_address: :class:`Pharmacy`
         """
+        start = time.time()
+
         tx_hash = self.contract.functions.addPrescriptionPermissions(
             prescription_address,
             pharmacy.contract_address
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.runtime['add_prescription_permissions'] += time.time() - start
+        self.gas_used['add_prescription_permissions'] += tx_receipt.gasUsed
+        self.transactions['add_prescription_permissions'] += 1
 
     def remove_prescription_permissions(self, prescription_address, pharmacy):
         """Removes a pharmacy as permissioned to view and fill the
@@ -228,12 +265,17 @@ class Patient(Roles):
             permissioned on the prescription.
         :type personal_address: :class:`Pharmacy`
         """
+        start = time.time()
+
         tx_hash = self.contract.functions.removePrescriptionPermissions(
             prescription_address,
             pharmacy.contract_address
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.runtime['remove_prescription_permissions'] += time.time() - start
+        self.gas_used['remove_prescription_permissions'] += tx_receipt.gasUsed
+        self.transactions['remove_prescription_permissions'] += 1
 
     def request_fill(self, prescription_address):
         """Sets a request fill flag to true for the specified
@@ -243,11 +285,14 @@ class Patient(Roles):
             a fill for.
         :param prescription_address: str
         """
-        tx_hash = self.contract.functions.requestFill(
-            prescription_address
-        ).transact(self.sender)
+        start = time.time()
+
+        tx_hash = self.contract.functions.requestFill(prescription_address).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.runtime['request_fill'] += time.time() - start
+        self.gas_used['request_fill'] += tx_receipt.gasUsed
+        self.transactions['request_fill'] += 1
 
     def get_prescriptions(self):
         """Returns a list of all prescription contract addresses
@@ -273,17 +318,24 @@ class Prescriber(Provider):
 
     def __init__(self, personal_address, npi):
         super().__init__(personal_address, npi)
-        self.contract_address = Roles._registrar.new_prescriber(
-            self.personal_address,
-            self.npi
-        )
-        self.contract = w3.eth.contract(
-            address=self.contract_address,
-            abi=bridge.PRESCRIBER_ABI
-        )
+        self.contract_address = Roles._registrar.new_prescriber(self.personal_address, self.npi)
+        self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PRESCRIBER_ABI)
+        self.runtime = {'new_prescription': 0, 'refill_prescription': 0}
+        self.gas_used = {'new_prescription': 0, 'refill_prescription': 0}
+        self.transactions = {'new_prescription': 0, 'refill_prescription': 0}
 
     def __repr__(self):
         return f'Prescriber(contract_address={self.contract_address})'
+
+    def to_dict(self):
+        return {
+            'role': 'prescriber',
+            'personal_address': self.personal_address,
+            'contract_address': self.contract_address,
+            'runtime': self.runtime,
+            'gas_used': self.gas_used,
+            'transactions': self.transactions
+        }
 
     def new_prescription(self, patient, ndc, quantity, refills):
         """Deploys new prescription contract to Ganache.
@@ -300,6 +352,8 @@ class Prescriber(Provider):
         :returns: Contract address of the newly deployed prescription.
         :rtype: str
         """
+        start = time.time()
+
         tx_hash = self.contract.functions.createPrescription(
             patient.contract_address,
             ndc,
@@ -307,8 +361,14 @@ class Prescriber(Provider):
             refills
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+        self.runtime['new_prescription'] += time.time() - start
+
         tx_event = self.contract.events.NewAddress().processReceipt(tx_receipt)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.gas_used['new_prescription'] += tx_receipt.gasUsed
+        self.transactions['new_prescription'] += 1
+
         return str(tx_event[0]['args']['contractAddress'])
 
     def refill_prescription(self, prescription_address, refill_count):
@@ -320,22 +380,20 @@ class Prescriber(Provider):
         :param refill_count: Updated number of prescription refills.
         :type refill_count: int
         """
+        start = time.time()
+
         tx_hash = self.contract.functions.refillPrescription(
             prescription_address,
             refill_count
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+
+        self.runtime['refill_prescription'] += time.time() - start
+
         prescription_address.refills = refill_count
-        self.gas_used += tx_receipt.gasUsed
 
-    def cancel_prescription(self, prescription_address):
-        """Updates the refill number to 0 for a specified prescription.
-
-        :param prescription_address: Contract address of a deployed
-            prescription.
-        :type prescription_address: str
-        """
-        self.refill_prescription(prescription_address, 0)
+        self.gas_used['refill_prescription'] += tx_receipt.gasUsed
+        self.transactions['refill_prescription'] += 1
 
 
 class Pharmacy(Provider):
@@ -352,17 +410,24 @@ class Pharmacy(Provider):
 
     def __init__(self, personal_address, npi):
         super().__init__(personal_address, npi)
-        self.contract_address = Roles._registrar.new_pharmacy(
-            self.personal_address,
-            self.npi
-        )
-        self.contract = w3.eth.contract(
-            address=self.contract_address,
-            abi=bridge.PHARMACY_ABI
-        )
+        self.contract_address = Roles._registrar.new_pharmacy(self.personal_address, self.npi)
+        self.contract = w3.eth.contract(address=self.contract_address, abi=bridge.PHARMACY_ABI)
+        self.runtime = {'add_prescription': 0, 'fill_prescription': 0, 'request_refill': 0}
+        self.gas_used = {'add_prescription': 0, 'fill_prescription': 0, 'request_refill': 0}
+        self.transactions = {'add_prescription': 0, 'fill_prescription': 0, 'request_refill': 0}
 
     def __repr__(self):
         return f'Pharmacy(contract_address={self.contract_address})'
+
+    def to_dict(self):
+        return {
+            'role': 'pharmacy',
+            'personal_address': self.personal_address,
+            'contract_address': self.contract_address,
+            'runtime': self.runtime,
+            'gas_used': self.gas_used,
+            'transactions': self.transactions
+        }
 
     def add_prescription(self, prescription_address):
         """Adds the specified prescription to the :class:`Pharmacy`'s
@@ -372,11 +437,18 @@ class Pharmacy(Provider):
             prescription.
         :type prescription_address: str
         """
+        # Start Timer
+        start = time.time()
+
         tx_hash = self.contract.functions.addPrescription(
             prescription_address
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        # Stop Timer
+        self.runtime['add_prescription'] += time.time() - start
+        self.gas_used['add_prescription'] += tx_receipt.gasUsed
+        self.transactions['add_prescription'] += 1
 
     def fill_prescription(self, prescription_address, fill_count):
         """Fills the specified prescription.
@@ -388,12 +460,17 @@ class Pharmacy(Provider):
             prescription contract's refills.
         :type fill_count: int
         """
+        start = time.time()
+
         tx_hash = self.contract.functions.fillPrescription(
             prescription_address,
             fill_count
         ).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.runtime['fill_prescription'] += time.time() - start
+        self.gas_used['fill_prescription'] += tx_receipt.gasUsed
+        self.transactions['fill_prescription'] += 1
 
     def request_refill(self, prescription_address):
         """Sets the request refill flag to true for the specified
@@ -403,8 +480,11 @@ class Pharmacy(Provider):
             prescription.
         :type prescription_address: str
         """
-        tx_hash = self.contract.functions.requestRefill(
-            prescription_address
-        ).transact(self.sender)
+        start = time.time()
+
+        tx_hash = self.contract.functions.requestRefill(prescription_address).transact(self.sender)
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-        self.gas_used += tx_receipt.gasUsed
+
+        self.runtime['request_refill'] += time.time() - start
+        self.gas_used['request_refill'] += tx_receipt.gasUsed
+        self.transactions['request_refill'] += 1
