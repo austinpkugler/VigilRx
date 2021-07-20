@@ -9,15 +9,27 @@ VigilRx> source env/bin/activate
 
 Install Python dependences:
 ```
-VigilRx> pip install -r requirements.txt
+(env) VigilRx> pip install -r requirements.txt
 ```
 
 Install Ganache:
 ```
-VigilRx> npm install ganache-cli web3
+(env) VigilRx> npm install ganache-cli web3
 ```
 
 Build and run VigilRx:
 ```
-VigilRx/VigilRx> python cli.py --action=build
+(env) VigilRx/VigilRx> python cli.py --action=build
+```
+
+## Troubleshooting
+If compiling fails, install solc using snap:
+```
+(env) VigilRx/VigilRx> sudo snap install solc --edge
+```
+Or using apt:
+```
+(env) VigilRx/VigilRx> sudo add-apt-repository ppa:ethereum/ethereum
+(env) VigilRx/VigilRx> sudo apt-get update
+(env) VigilRx/VigilRx> sudo apt-get install solc 
 ```
